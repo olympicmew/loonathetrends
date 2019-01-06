@@ -109,9 +109,10 @@ class TwitterRetriever(object):
         return self._api.get_user(user).followers_count
 
 class MelonRetriever(object):
-    def __init__(self, crawlera_apikey):
+    def __init__(self):
         self._session = requests.Session()
-        self.session.proxies.update(get_proxies(crawlera_apikey))
+        self._session.headers.update({'accept': '*/*',
+                                      'user-agent': 'curl/7.53.1'})
 
     def get_fan_count(self, artistid):
         url = 'https://www.melon.com/artist/getArtistFanNTemper.json'
@@ -166,6 +167,16 @@ def write_videostats(db):
         c.execute('INSERT INTO video_stats VALUES (?, ?, ?, ?, ?, ?)',
                   (date, v['id'], v['viewCount'], v['likeCount'],
                    v['dislikeCount'], v['commentCount']))
+    db.commit()
+
+def write_melon(db):
+    retriever = MelonRetriever()
+    fan_count = retriever.get_fan_count(LOONA_MELONARTISTID)
+    date = get_current_time().format('YYYY-MM-DD')
+    record = (date, 'melon', count)
+    c = db.cursor()
+    c.execute('INSERT INTO followers (tstamp, site, count) VALUES (?, ?, ?)',
+              record)
     db.commit()
 
 def create_db(fname):
