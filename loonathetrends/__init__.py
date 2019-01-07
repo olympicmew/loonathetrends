@@ -6,25 +6,10 @@ import requests
 import sqlite3
 import arrow
 from .utils import get_moon_phase
+import os
 import os.path
 
 DBSCHEMA_PATH = os.path.join(os.path.split(__file__)[0], 'schema.sql')
-
-GOOGLEAPI_KEY = '***REMOVED***'
-LOONA_YTCHANNELID = 'UCOJplhB0wGQWv9OuRmMT-4g'
-LOONA_YTPLAYLISTID = 'UUOJplhB0wGQWv9OuRmMT-4g'
-
-SPOTIFY_CLIENTID = '***REMOVED***'
-SPOTIFY_CLIENTSECRET = '***REMOVED***'
-LOONA_SPOTIFYURI = 'spotify:artist:52zMTJCKluDlFwMQWmccY7'
-
-TWITTER_CONSUMERKEY = '***REMOVED***'
-TWITTER_CONSUMERSECRET = '***REMOVED***'
-TWITTER_ACCESSTOKEN = '***REMOVED***'
-TWITTER_ACCESSSECRET = '***REMOVED***'
-LOONA_TWITTERUSER = 'loonatheworld'
-
-LOONA_MELONARTISTID = '1229429'
 
 
 def get_current_time():
@@ -122,62 +107,72 @@ class MelonRetriever(object):
 
 
 def write_youtube(db):
-    retriever = YTRetriever(GOOGLEAPI_KEY)
-    stats = retriever.get_channel_stats(LOONA_YTCHANNELID)
-    date = get_current_time().format('YYYY-MM-DD')
-    record = (date, 'youtube', stats['subscriberCount'])
-    c = db.cursor()
-    c.execute('INSERT INTO followers VALUES (?, ?, ?)', record)
-    db.commit()
+    channelids = os.environ['YT_CHANNELIDS'].split(':')
+    retriever = YTRetriever(os.environ['GOOGLEAPI_KEY'])
+    for channelid in channelids:
+        stats = retriever.get_channel_stats(channelid)
+        date = get_current_time().format('YYYY-MM-DD')
+        record = (date, 'youtube', channelid, stats['subscriberCount'])
+        c = db.cursor()
+        c.execute('INSERT INTO followers VALUES (?, ?, ?, ?)', record)
+        db.commit()
 
 def write_spotify(db):
-    retriever = SpotifyRetriever(SPOTIFY_CLIENTID, SPOTIFY_CLIENTSECRET)
-    count = retriever.get_artist_followers(LOONA_SPOTIFYURI)
-    date = get_current_time().format('YYYY-MM-DD')
-    record = (date, 'spotify', count)
-    c = db.cursor()
-    c.execute('INSERT INTO followers VALUES (?, ?, ?)', record)
-    db.commit()
+    artistids = os.environ['SPOTIFY_ARTISTIDS'].split(':')
+    retriever = SpotifyRetriever(os.environ['SPOTIFY_CLIENTID'],
+                                 os.environ['SPOTIFY_CLIENTSECRET'])
+    for artistid in artistids:
+        count = retriever.get_artist_followers(artistid)
+        date = get_current_time().format('YYYY-MM-DD')
+        record = (date, 'spotify', artistid, count)
+        c = db.cursor()
+        c.execute('INSERT INTO followers VALUES (?, ?, ?, ?)', record)
+        db.commit()
 
 def write_twitter(db):
-    retriever = TwitterRetriever(TWITTER_CONSUMERKEY,
-                                 TWITTER_CONSUMERSECRET,
-                                 TWITTER_ACCESSTOKEN,
-                                 TWITTER_ACCESSSECRET)
-    count = retriever.get_followers_count(LOONA_TWITTERUSER)
-    date = get_current_time().format('YYYY-MM-DD')
-    record = (date, 'twitter', count)
-    c = db.cursor()
-    c.execute('INSERT INTO followers (tstamp, site, count) VALUES (?, ?, ?)',
-              record)
-    db.commit()
+    users = os.environ['TWITTER_USERS'].split(':')
+    retriever = TwitterRetriever(os.environ['TWITTER_CONSUMERKEY'],
+                                 os.environ['TWITTER_CONSUMERSECRET'],
+                                 os.environ['TWITTER_ACCESSTOKEN'],
+                                 os.environ['TWITTER_ACCESSSECRET'])
+    for user in users:
+        count = retriever.get_followers_count(user)
+        date = get_current_time().format('YYYY-MM-DD')
+        record = (date, 'twitter', user, count)
+        c = db.cursor()
+        c.execute('INSERT INTO followers VALUES (?, ?, ?, ?)', record)
+        db.commit()
 
 def write_videostats(db):
+    playlistids = os.environ['YT_PLAYLISTIDS'].split(':')
     retriever = YTRetriever(GOOGLEAPI_KEY)
-    videoids = retriever.get_video_ids(LOONA_YTPLAYLISTID)
-    videosinfo = retriever.get_videos_info(videoids)
-    date = get_current_time().format('YYYY-MM-DD HH:MM')
-    c = db.cursor()
-    for v in videosinfo:
-        c.execute('INSERT OR IGNORE INTO videos' \
-                  '(video_id, title, published_at, description, moon_phase)' \
-                  'VALUES (?, ?, ?, ?, ?)',
-                  (v['id'], v['title'], v['published_at'],
-                   v['description'], v['moon_phase']))
-        c.execute('INSERT INTO video_stats VALUES (?, ?, ?, ?, ?, ?)',
-                  (date, v['id'], v['viewCount'], v['likeCount'],
-                   v['dislikeCount'], v['commentCount']))
-    db.commit()
+    for playlistid in playlistids:
+        videoids = retriever.get_video_ids(playlistid)
+        videosinfo = retriever.get_videos_info(videoids)
+        date = get_current_time().format('YYYY-MM-DD HH:MM')
+        c = db.cursor()
+        for v in videosinfo:
+            c.execute('INSERT OR IGNORE INTO videos' \
+                      '(video_id, title, published_at, description, moon_phase)' \
+                      'VALUES (?, ?, ?, ?, ?)',
+                      (v['id'], v['title'], v['published_at'],
+                       v['description'], v['moon_phase']))
+            c.execute('INSERT INTO video_stats VALUES (?, ?, ?, ?, ?, ?)',
+                      (date, v['id'], v['viewCount'], v['likeCount'],
+                       v['dislikeCount'], v['commentCount']))
+        db.commit()
 
 def write_melon(db):
+    artistids = os.environ['MELON_ARTISTIDS'].split(':')
     retriever = MelonRetriever()
-    fan_count = retriever.get_fan_count(LOONA_MELONARTISTID)
-    date = get_current_time().format('YYYY-MM-DD')
-    record = (date, 'melon', count)
-    c = db.cursor()
-    c.execute('INSERT INTO followers (tstamp, site, count) VALUES (?, ?, ?)',
-              record)
-    db.commit()
+    for artistid in artistids:
+        count = retriever.get_fan_count(artistid)
+        date = get_current_time().format('YYYY-MM-DD')
+        record = (date, 'melon', artistid, count)
+        c = db.cursor()
+        c.execute('INSERT INTO followers VALUES (?, ?, ?, ?)',
+                  record)
+        db.commit()
 
 def create_db(fname):
     db = sqlite3.connect(fname)

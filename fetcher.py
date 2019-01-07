@@ -4,20 +4,19 @@ import argparse
 import logging
 
 argparser = argparse.ArgumentParser()
-argparser.add_argument('db')
-argparser.add_argument('--videostats', action='store_true')
+argparser.add_argument('mode')
 args = argparser.parse_args()
 
 logging.basicConfig(filename='fetcher.log', level=logging.INFO,
                     format='%(asctime)s:%(levelname)s:%(message)s')
 
-db = sqlite3.connect(args.db)
+db = sqlite3.connect(os.environ['DBPATH'])
 logging.info('Database connected')
 
-if args.videostats:
+if args.mode == 'video-stats':
     ltt.write_videostats(db)
     logging.info('Youtube stats: done')
-else:
+elif args.mode == 'followers':
     ltt.write_youtube(db)
     logging.info('Youtube: done')
     ltt.write_spotify(db)
