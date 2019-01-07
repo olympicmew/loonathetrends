@@ -11,5 +11,5 @@ Follower counts weekly roundup ({date}) 🤖
 
 Youtube: {difs[youtube]:+,} subscribers
 Twitter: {difs[twitter]:+,} followers
-Spotify: {difs[spotify]:+,} followers
-Melon: {difs[melon]:+,} followers'''
+Spotify: {difs[spotify]:+,} followers'''
+#Melon: {difs[melon]:+,} followers'''
