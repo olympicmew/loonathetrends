@@ -19,7 +19,8 @@ CREATE TABLE IF NOT EXISTS `video_stats` (
 CREATE TABLE IF NOT EXISTS `followers` (
 	`tstamp`	TEXT NOT NULL,
 	`site`	TEXT NOT NULL,
+	`resource_id`	TEXT NOT NULL,
 	`count`	INTEGER NOT NULL,
-	PRIMARY KEY(`site`,`tstamp`)
+	PRIMARY KEY(`site`,`resource_id`,`tstamp`)
 );
 COMMIT;
