@@ -4,7 +4,7 @@ import logging
 import sqlite3
 import loonathetrends.bot as lttbot
 
-DBPATH = os.environ['LOONATHETRENDS_DBPATH']
+DBPATH = os.environ['DBPATH']
 
 argparser = argparse.ArgumentParser()
 argparser.add_argument('type')

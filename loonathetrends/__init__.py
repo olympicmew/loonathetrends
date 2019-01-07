@@ -145,11 +145,11 @@ def write_twitter(db):
 
 def write_videostats(db):
     playlistids = os.environ['YT_PLAYLISTIDS'].split(':')
-    retriever = YTRetriever(GOOGLEAPI_KEY)
+    retriever = YTRetriever(os.environ['GOOGLEAPI_KEY'])
     for playlistid in playlistids:
         videoids = retriever.get_video_ids(playlistid)
         videosinfo = retriever.get_videos_info(videoids)
-        date = get_current_time().format('YYYY-MM-DD HH:MM')
+        date = get_current_time().format('YYYY-MM-DD HH:mm')
         c = db.cursor()
         for v in videosinfo:
             c.execute('INSERT OR IGNORE INTO videos' \
