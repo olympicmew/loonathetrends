@@ -10,7 +10,7 @@ auth.set_access_token(os.environ['TWITTER_ACCESSTOKEN'],
                       os.environ['TWITTER_ACCESSSECRET'])
 twitter = tweepy.API(auth)
 
-def followers_update(db, freq):
+def followers_update(db, freq, dry_run=False):
 	if freq == 'daily':
 		query = "SELECT * FROM followers " \
                 "WHERE tstamp = date('now','-1 days') " \
@@ -32,5 +32,6 @@ def followers_update(db, freq):
 	tots = grouped.last()['count'].to_dict()
 	difs = (grouped.last()['count'] - grouped.first()['count']).to_dict()
 	status = template.format(date=date, tots=tots, difs=difs)
-	twitter.update_status(status)
+	if not dry_run:
+		twitter.update_status(status)
 	return status
