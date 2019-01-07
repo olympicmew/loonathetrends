@@ -13,7 +13,7 @@ args = argparser.parse_args()
 logging.basicConfig(filename='bot.log', level=logging.INFO,
                     format='%(asctime)s:%(levelname)s:%(message)s')
 
-db = sqlite3.connect(args.db)
+db = sqlite3.connect(DBPATH)
 logging.info('Database connected')
 
 if args.type == 'followers-daily':
