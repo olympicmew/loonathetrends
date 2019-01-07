@@ -3,10 +3,10 @@ Follower counts daily update ({date}) 🤖
 
 YouTube: {tots[youtube]:,} ({difs[youtube]:+,}) subscribers
 Twitter: {tots[twitter]:,} ({difs[twitter]:+,}) followers
-Spotify: {tots[spotify]:,} ({difs[spotify]:+,}) followers
-Melon: {tot[melon]:,} ({dif[melon]:+,}) followers'''
+Spotify: {tots[spotify]:,} ({difs[spotify]:+,}) followers'''
+#Melon: {tot[melon]:,} ({dif[melon]:+,}) followers'''
 
-followers_daily = '''\
+followers_weekly = '''\
 Follower counts weekly roundup ({date}) 🤖
 
 Youtube: {difs[youtube]:+,} subscribers
