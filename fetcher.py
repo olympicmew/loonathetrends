@@ -2,6 +2,7 @@ import loonathetrends as ltt
 import sqlite3
 import argparse
 import logging
+import os
 
 argparser = argparse.ArgumentParser()
 argparser.add_argument('mode')
