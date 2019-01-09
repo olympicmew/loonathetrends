@@ -18,7 +18,7 @@ videostats = '''\
 {title}
 YouTube stats update ({date} KST) 🤖
 
-Views: {tots[views]:,} ({rates[views]:,} views/hour)
-Likes: {tots[likes]:,} ({rates[likes]:,} likes/hour)
-Dislikes: {tots[dislikes]:,} ({rates[dislikes]:,} dislikes/hour)
-Comments: {tots[comments]:,} ({rates[comments]:,} comments/hour)'''
+Views: {tots[views]:,} ({rates[views]:,.1f} views/hour)
+Likes: {tots[likes]:,} ({rates[likes]:,.1f} likes/hour)
+Dislikes: {tots[dislikes]:,} ({rates[dislikes]:,.1f} dislikes/hour)
+Comments: {tots[comments]:,} ({rates[comments]:,.1f} comments/hour)'''
