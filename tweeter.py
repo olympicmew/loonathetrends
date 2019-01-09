@@ -29,3 +29,9 @@ elif args.type == 'followers-weekly':
 		print(status)
 	else:
 		logging.info(status)
+elif args.type == 'videostats-8h':
+    status = lttbot.videostats_update(db, '8h', args.dry_run)
+    if args.dry_run:
+        print(status)
+    else:
+        logging.info(status)

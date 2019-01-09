@@ -13,3 +13,12 @@ Youtube: {difs[youtube]:+,} subscribers
 Twitter: {difs[twitter]:+,} followers
 Spotify: {difs[spotify]:+,} followers'''
 #Melon: {difs[melon]:+,} followers'''
+
+videostats = '''\
+{title}
+YouTube stats update ({date} KST) 🤖
+
+Views: {tots[views]:,} ({rates[views]:,} views/hour)
+Likes: {tots[likes]:,} ({rates[likes]:,} likes/hour)
+Dislikes: {tots[dislikes]:,} ({rates[dislikes]:,} dislikes/hour)
+Comments: {tots[comments]:,} ({rates[comments]:,} comments/hour)'''
