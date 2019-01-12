@@ -18,17 +18,18 @@ db = sqlite3.connect(DBPATH)
 logging.info('Database connected')
 
 if args.type == 'followers-daily':
-	status = lttbot.followers_update(db, 'daily', args.dry_run)
-	if args.dry_run:
-		print(status)
-	else:
-		logging.info(status)
+    status = lttbot.followers_update(db, 'daily', args.dry_run)
+    if args.dry_run:
+        print(status)
+    else:
+        logging.info(status)
 elif args.type == 'followers-weekly':
-	status = lttbot.follwers_update(db, 'weekly', args.dry_run)
-	if args.dry_run:
-		print(status)
-	else:
-		logging.info(status)
+    status = lttbot.follwers_update(db, 'weekly', args.dry_run,
+                                    post_plots=True)
+    if args.dry_run:
+        print(status)
+    else:
+        logging.info(status)
 elif args.type == 'videostats-8h':
     status = lttbot.videostats_update(db, '8h', args.dry_run)
     if args.dry_run:
