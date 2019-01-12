@@ -4,7 +4,7 @@ Follower counts daily update ({date} 6pm KST) 🤖
 YouTube: {tots[youtube]:,} ({difs[youtube]:+,}) subscribers
 Twitter: {tots[twitter]:,} ({difs[twitter]:+,}) followers
 Spotify: {tots[spotify]:,} ({difs[spotify]:+,}) followers'''
-#Melon: {tot[melon]:,} ({dif[melon]:+,}) followers'''
+#Melon: {tots[melon]:,} ({difs[melon]:+,}) followers'''
 
 followers_weekly = '''\
 Follower counts weekly roundup ({date} 6pm KST) 🤖
@@ -15,10 +15,13 @@ Spotify: {difs[spotify]:+,} followers'''
 #Melon: {difs[melon]:+,} followers'''
 
 videostats = '''\
-{title}
 YouTube stats update ({date} KST) 🤖
 
-Views: {tots[views]:,} ({rates[views]:,} views/hour)
-Likes: {tots[likes]:,} ({rates[likes]:,} likes/hour)
-Dislikes: {tots[dislikes]:,} ({rates[dislikes]:,} dislikes/hour)
-Comments: {tots[comments]:,} ({rates[comments]:,} comments/hour)'''
+{title}
+▶️ http://youtu.be/{videoid}
+
+Views: {tots[views]:,.0f} ({rates[views]:,.1f} views/hour)
+Likes: {tots[likes]:,.0f} ({rates[likes]:,.1f} likes/hour)
+Dislikes: {tots[dislikes]:,.0f} ({rates[dislikes]:,.1f} dislikes/hour)
+Comments: {tots[comments]:,.0f} ({rates[comments]:,.1f} comments/hour)'''
+

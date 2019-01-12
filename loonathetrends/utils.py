@@ -1,5 +1,5 @@
 import ephem
-import collections.abc
+import pandas as pd
 
 def get_moon_phase(date):
 	date = ephem.Date(date.datetime)
