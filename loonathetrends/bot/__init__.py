@@ -1,15 +1,15 @@
 import os
-import tweepy
+from twitter import OAuth, Twitter
 import pandas as pd
 import arrow
 from . import templates
 from loonathetrends.utils import get_video_title_lookup
 
-auth = tweepy.OAuthHandler(os.environ['TWITTER_CONSUMERKEY'],
-                           os.environ['TWITTER_CONSUMERSECRET'])
-auth.set_access_token(os.environ['TWITTER_ACCESSTOKEN'],
-                      os.environ['TWITTER_ACCESSSECRET'])
-twitter = tweepy.API(auth)
+auth = OAuth(os.environ['TWITTER_ACCESSTOKEN'],
+             os.environ['TWITTER_ACCESSSECRET'],
+             os.environ['TWITTER_CONSUMERKEY'],
+             os.environ['TWITTER_CONSUMERSECRET'])
+t = Twitter(auth)
 
 def followers_update(db, freq, dry_run=False):
 	if freq == 'daily':
@@ -34,7 +34,7 @@ def followers_update(db, freq, dry_run=False):
 	difs = (grouped.last()['count'] - grouped.first()['count']).to_dict()
 	status = template.format(date=date, tots=tots, difs=difs)
 	if not dry_run:
-		twitter.update_status(status)
+		t.statuses.update(status=status)
 	return status
 
 def videostats_update(db, freq, dry_run=False):
@@ -59,5 +59,5 @@ def videostats_update(db, freq, dry_run=False):
     template = templates.videostats
     status = template.format(title=title, date=date, tots=tots, rates=rates)
     if not dry_run:
-        twitter.update_status(status)
+        t.statuses.update(status=status)
     return status

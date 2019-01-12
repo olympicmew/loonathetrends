@@ -1,7 +1,7 @@
 from googleapiclient.discovery import build
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials as SCC
-import tweepy
+import twitter
 import requests
 import sqlite3
 import arrow
@@ -86,12 +86,11 @@ class SpotifyRetriever(object):
 
 class TwitterRetriever(object):
     def __init__(self, consumer_key, consumer_secret, access_token, access_secret):
-        self._auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-        self._auth.set_access_token(access_token, access_secret)
-        self._api = tweepy.API(self._auth)
+        self._auth = twitter.OAuth(access_token, access_secret, consumer_key, consumer_secret)
+        self._api = twitter.Twitter(auth=self._auth)
 
     def get_followers_count(self, user):
-        return self._api.get_user(user).followers_count
+        return self._api.users.show(screen_name=user)['followers_count']
 
 class MelonRetriever(object):
     def __init__(self):
