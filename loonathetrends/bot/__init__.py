@@ -69,3 +69,46 @@ def videostats_update(db, freq, dry_run=False):
     if not dry_run:
         t.statuses.update(status=status)
     return status
+
+def youtube_update(db, kind, dry_run=False):
+    # create DataFrame for stats
+    allstats = pd.read_sql('SELECT * FROM video_stats ORDER BY tstamp',
+                           db, parse_dates=['tstamp']).set_index('tstamp')
+    
+    # find out what video to post about
+    func = lambda x: x.diff().last('7d').sum()
+    if kind == 'latest':
+        videoid = pd.read_sql('SELECT published_at, video_id FROM videos ' \
+                              'ORDER BY published_at', db)['video_id'].iloc[-1]
+    elif kind == 'views':
+        videoid = allstats.groupby('video_id')['views'].agg(func).idxmax()
+    elif kind == 'comments':
+        videoid = allstats.groupby('video_id')['comments'].agg(func).idxmax()
+    
+    # get and trim stats
+    stats = allstats[allstats.video_id == videoid].drop('video_id', axis=1)
+    last = stats.index[-1]
+    trimmed = stats.reindex(pd.date_range(last - pd.Timedelta('7d'), last, freq='h'))
+    
+    # assign fill-ins for template
+    tots = trimmed.iloc[-1].to_dict()
+    rates = (trimmed.diff().mean() * 24).to_dict()
+    date = arrow.get(last).format('YYYY-MM-DD')
+    
+    # make charts
+    # TODO
+    
+    # fill template
+    kind_template = {'latest': 'Latest upload from @loonatheworld:',
+                     'views': 'The most viewed video this week:',
+                     'comments': 'The most commented video this week:',
+                    }
+    template = templates.youtube_update
+    status = template.format(kind=kind_template[kind],
+                             date=date, tots=tots,
+                             rates=rates, videoid=videoid)
+    
+    # post on twitter
+    if not dry_run:
+        t.statuses.update(status=status)
+    return status
