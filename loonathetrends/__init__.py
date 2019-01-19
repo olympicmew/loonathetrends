@@ -151,11 +151,14 @@ def write_videostats(db):
         date = get_current_time().shift(minutes=1).format('YYYY-MM-DD HH:mm')
         c = db.cursor()
         for v in videosinfo:
+            pubdate = arrow.get(v['published_at']).to('Asia/Seoul').format('YYYY-MM-DD HH:00')
             c.execute('INSERT OR IGNORE INTO videos' \
                       '(video_id, title, published_at, description, moon_phase)' \
                       'VALUES (?, ?, ?, ?, ?)',
                       (v['id'], v['title'], v['published_at'],
                        v['description'], v['moon_phase']))
+            c.execute('INSERT OR IGNORE INTO video_stats VALUES (?, ?, 0, 0, 0, 0)',
+                      (pubdate, v['id']))
             c.execute('INSERT INTO video_stats VALUES (?, ?, ?, ?, ?, ?)',
                       (date, v['id'], v['viewCount'], v['likeCount'],
                        v['dislikeCount'], v['commentCount']))
