@@ -88,7 +88,9 @@ def youtube_update(db, kind, dry_run=False):
     # get and trim stats
     stats = allstats[allstats.video_id == videoid].drop('video_id', axis=1)
     last = stats.index[-1]
-    trimmed = stats.reindex(pd.date_range(last - pd.Timedelta('7d'), last, freq='h'))
+    # '42h' when milestone is live, '56h' when roundup is live
+    length = pd.Timedelta('1.4d' if kind == 'latest' else '7d')
+    trimmed = stats.reindex(pd.date_range(last - length, last, freq='h'))
     
     # assign fill-ins for template
     tots = trimmed.iloc[-1].to_dict()
