@@ -96,7 +96,7 @@ def youtube_update(db, kind, dry_run=False):
     date = arrow.get(last).format('YYYY-MM-DD')
     
     # make charts
-    # TODO
+    media = plots.youtube_update(db, videoid)
     
     # fill template
     kind_template = {'latest': 'Latest upload from @loonatheworld:',
@@ -110,5 +110,6 @@ def youtube_update(db, kind, dry_run=False):
     
     # post on twitter
     if not dry_run:
-        t.statuses.update(status=status)
+        media_id = t_upload.media.upload(media=img)['media_id_string']
+        t.statuses.update(status=status, media_ids=media_id)
     return status
