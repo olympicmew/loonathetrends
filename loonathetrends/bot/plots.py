@@ -3,7 +3,7 @@ import seaborn as sns
 from matplotlib.ticker import FuncFormatter
 import matplotlib.pyplot as plt
 from io import BytesIO
-from loonathetrends.utils import get_video_title_lookup, video_date_lookup
+from loonathetrends.utils import get_video_title_lookup
 
 sns.set('talk', 'ticks', font='Source Han Sans KR', rc={'axes.grid': True})
 
