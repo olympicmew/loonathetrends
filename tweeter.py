@@ -25,8 +25,8 @@ if args.type == 'followers-daily':
     else:
         logging.info(status)
 elif args.type == 'followers-weekly':
-    status = lttbot.follwers_update(db, 'weekly', args.dry_run,
-                                    post_plots=True)
+    status = lttbot.followers_update(db, 'weekly', args.dry_run,
+                                     post_plots=True)
     if args.dry_run:
         print(status)
     else:

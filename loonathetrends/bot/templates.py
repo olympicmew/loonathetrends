@@ -1,5 +1,5 @@
 followers_daily = '''\
-Follower counts daily update ({date} 6pm KST) 🤖
+Social media daily update ({date}) 🤖
 
 YouTube: {tots[youtube]:,} ({difs[youtube]:+,}) subscribers
 Twitter: {tots[twitter]:,} ({difs[twitter]:+,}) followers
@@ -8,13 +8,13 @@ Spotify: {tots[spotify]:,} ({difs[spotify]:+,}) followers
 #Melon: {tots[melon]:,} ({difs[melon]:+,}) followers
 
 followers_weekly = '''\
-Follower counts weekly roundup ({date} 6pm KST) 🤖
+Social media weekly roundup ({date}) 🤖
 
-Youtube: {difs[youtube]:+,} subscribers
-Twitter: {difs[twitter]:+,} followers
-Spotify: {difs[spotify]:+,} followers
+Youtube: {tots[youtube]:,} ({difs[youtube]:+,}) subscribers
+Twitter: {tots[twitter]:,} ({difs[twitter]:+,}) followers
+Spotify: {tots[spotify]:,} ({difs[spotify]:+,}) followers
 '''
-#Melon: {difs[melon]:+,} followers
+#Melon: {tots[melon]:,} ({difs[melon]:+,}) followers'''
 
 videostats = '''\
 YouTube stats update ({date} KST) 🤖

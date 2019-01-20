@@ -24,5 +24,5 @@ elif args.mode == 'followers':
     logging.info('Spotify: done')
     ltt.write_twitter(db)
     logging.info('Twitter: done')
-    ltt.write_melon(db)
-    logging.info('Melon: done')
+#    ltt.write_melon(db)
+#    logging.info('Melon: done')
