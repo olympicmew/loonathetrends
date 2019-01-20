@@ -1,5 +1,6 @@
 import os
 from twitter import OAuth, Twitter
+import numpy as np
 import pandas as pd
 import arrow
 from . import templates, plots
@@ -11,6 +12,17 @@ auth = OAuth(os.environ['TWITTER_ACCESSTOKEN'],
              os.environ['TWITTER_CONSUMERSECRET'])
 t = Twitter(auth=auth)
 t_upload = Twitter(domain='upload.twitter.com', auth=auth)
+
+MILESTONES = {100_000: '100k',
+              200_000: '200k',
+              500_000: '500k',
+              1_000_000: '1M',
+              2_000_000: '2M',
+              5_000_000: '5M',
+              10_000_000: '10M',
+              20_000_000: '20M',
+              50_000_000: '50M',
+              100_000_000: '100M'}
 
 def followers_update(db, freq, dry_run=False, post_plots=False):
     if freq == 'daily':
@@ -26,7 +38,7 @@ def followers_update(db, freq, dry_run=False, post_plots=False):
                 "ORDER BY tstamp"
         template = templates.followers_weekly
     else:
-        raise RuntimeException('Parameter freq provided not valid')
+        raise RuntimeError('Parameter freq provided not valid')
     df = pd.read_sql(query, db)
     date = df['tstamp'].iloc[-1]
     grouped = df.groupby('site')
@@ -114,4 +126,43 @@ def youtube_update(db, kind, dry_run=False):
     if not dry_run:
         media_id = t_upload.media.upload(media=media)['media_id_string']
         t.statuses.update(status=status, media_ids=media_id)
+    return status
+
+
+def youtube_milestone(db, dry_run=False):
+    # get the stats
+    stats = pd.read_sql('select * from video_stats order by tstamp', db,
+                        parse_dates=['tstamp'])
+    # get the current view counts for all videos
+    views = stats.groupby('video_id')['views'].last()
+    # calculate how many views are left for each milestone for all videos
+    marray = np.array(list(MILESTONES)).reshape((1, len(MILESTONES)))
+    varray = np.array(views).reshape((len(views), 1))
+    viewsleft = pd.DataFrame(columns = MILESTONES,
+                             data = marray - varray,
+                             index = views.index)
+    viewsleft = viewsleft[viewsleft > 0] # discard reached milestones
+    # calculate the current view rate for all videos
+    pivot = stats.pivot(index='tstamp', columns='video_id', values='views')
+    rates = pivot.last('7d1h').asfreq('h').diff().mean()*24
+    # calculate how many days are left to reach the milestones
+    daysleft = viewsleft.apply(lambda x: x / rates)
+    # find out the featured video for today
+    videoid = daysleft.min(axis=1).idxmin()
+    milestone = viewsleft.loc[videoid].idxmin()
+    # create the mapping for the tweet template
+    fillin = {
+        'date': arrow.now().format('YYYY-MM-DD'),
+        'videoid': videoid,
+        'diff': viewsleft.loc[videoid].min(),
+        'milestone': MILESTONES[milestone],
+        'prediction': (arrow.now()
+                       .shift(days=daysleft.loc[videoid,milestone])
+                       .humanize()),
+    }
+    # fill in the template and post on Twitter
+    template = templates.youtube_milestone
+    status = template.format(**fillin)
+    if not dry_run:
+        t.statuses.update(status=status)
     return status

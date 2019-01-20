@@ -39,3 +39,12 @@ YouTube stats update ({date}) 🤖
 💔: {tots[dislikes]:,.0f} ({rates[dislikes]:,.1f} dislikes/day)
 💬: {tots[comments]:,.0f} ({rates[comments]:,.1f} comments/day)
 '''
+
+youtube_milestone = '''\
+#OrbitStreamingWednesday ({date}) 🤖
+
+This video needs some love:
+▶️ http://youtu.be/{videoid}
+
+It needs {diff:,.0f} views to reach {milestone}. It should get there {prediction}, but we can make it happen faster!
+'''
