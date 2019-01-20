@@ -112,6 +112,6 @@ def youtube_update(db, kind, dry_run=False):
     
     # post on twitter
     if not dry_run:
-        media_id = t_upload.media.upload(media=img)['media_id_string']
+        media_id = t_upload.media.upload(media=media)['media_id_string']
         t.statuses.update(status=status, media_ids=media_id)
     return status
