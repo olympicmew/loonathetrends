@@ -1,8 +1,10 @@
 import loonathetrends.utils as utils
 from twitter import OAuth, Twitter
 import arrow
+import re
 import os
 import math
+from sys import argv
 
 auth = OAuth(os.environ['TWITTER_ACCESSTOKEN'],
              os.environ['TWITTER_ACCESSSECRET'],
@@ -11,11 +13,12 @@ auth = OAuth(os.environ['TWITTER_ACCESSTOKEN'],
 t = Twitter(auth=auth)
 
 def update_handle():
-    me = t.account.verify_credentials()
+    handle = t.account.verify_credentials()['name']
     phase = utils.get_moon_phase(arrow.utcnow())
     emoji = utils.get_moon_emoji(phase)
-    handle = emoji + me['name'][1:]
-    t.account.update_profile(name=handle)
+    new_handle = re.sub(r'^(loonathetrends) [🌑🌒🌓🌔🌕🌖🌗🌘]',
+                        r'\1 {}'.format(emoji), handle)
+    t.account.update_profile(name=new_handle)
 
 def update_color():
     birth = arrow.get('2018-08-20 18:00+0900')
@@ -39,10 +42,10 @@ def update_color():
     fG = round((emo[1]+phy[1]+ine[1])/3*255)
     fB = round((emo[2]+phy[2]+ine[2])/3*255)
     
-    color = (hex(fR)[2:] + hex(fG)[2:] + hex(fB)[2:]).upper()
+    color = f'{fR:02X}{fG:02X}{fB:02X}'
     t.account.update_profile(profile_link_color=color)
 
 if __name__ == '__main__':
     update_handle()
-    #update_color()
-    
+    update_color()
+
