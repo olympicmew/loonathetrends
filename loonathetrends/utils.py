@@ -16,3 +16,8 @@ def get_video_title_lookup(db):
     df = pd.read_sql('select video_id, title from videos',
                      db, index_col='video_id')
     return df.title.to_dict()
+
+def get_video_ismv_lookup(db):
+    df = pd.read_sql('select video_id, title from videos',
+                     db, index_col='video_id')
+    return df.title.str.startswith('[MV]').to_dict()
