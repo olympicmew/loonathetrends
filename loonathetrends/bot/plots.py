@@ -102,4 +102,4 @@ def youtube_update(db, videoid, metric='views'):
     image = BytesIO()
     ax.get_figure().savefig(image, format='png', dpi=160, bbox_inches='tight')
     
-    return image
+    return image.getvalue()

@@ -86,6 +86,7 @@ def youtube_update(db, kind, dry_run=False):
     # create DataFrame for stats
     allstats = pd.read_sql('SELECT * FROM video_stats ORDER BY tstamp',
                            db, parse_dates=['tstamp']).set_index('tstamp')
+    lookup = get_video_title_lookup(db)
     
     # find out what video to post about
     func = lambda x: x.diff().last('7d').sum()
@@ -105,6 +106,7 @@ def youtube_update(db, kind, dry_run=False):
     trimmed = stats.reindex(pd.date_range(last - length, last, freq='h'))
     
     # assign fill-ins for template
+    title = lookup[videoid]
     tots = trimmed.iloc[-1].to_dict()
     rates = (trimmed.diff().mean() * 24).to_dict()
     date = arrow.get(last).format('YYYY-MM-DD')
@@ -119,7 +121,7 @@ def youtube_update(db, kind, dry_run=False):
                     }
     template = templates.youtube_update
     status = template.format(kind=kind_template[kind],
-                             date=date, tots=tots,
+                             title=title, date=date, tots=tots,
                              rates=rates, videoid=videoid)
     
     # post on twitter

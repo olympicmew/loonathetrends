@@ -32,6 +32,7 @@ youtube_update = '''\
 YouTube stats update ({date}) 🤖
 
 {kind}
+{title}
 ▶️ http://youtu.be/{videoid}
 
 👁️: {tots[views]:,.0f} ({rates[views]:,.1f} views/day)
