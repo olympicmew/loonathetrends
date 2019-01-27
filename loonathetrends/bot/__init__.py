@@ -135,6 +135,7 @@ def youtube_milestone(db, dry_run=False):
     # get the stats
     stats = pd.read_sql('select * from video_stats order by tstamp', db,
                         parse_dates=['tstamp'])
+    mvlookup = pd.Series(get_video_ismv_lookup(db))
     # get the current view counts for all videos
     views = stats.groupby('video_id')['views'].last()
     # calculate how many views are left for each milestone for all videos
@@ -148,9 +149,10 @@ def youtube_milestone(db, dry_run=False):
     pivot = stats.pivot(index='tstamp', columns='video_id', values='views')
     rates = pivot.last('7d1h').asfreq('h').diff().mean()*24
     # calculate how many days are left to reach the milestones
-    daysleft = viewsleft.apply(lambda x: x / rates)
+    daysleft = viewsleft.apply(lambda x: x / rates).min(axis=1)
     # find out the featured video for today
-    videoid = daysleft.min(axis=1).idxmin()
+    daysleft_mv = daysleft[(daysleft <= 7) & mvlookup]
+    videoid = daysleft.idxmin() if daysleft_mv.empty else daysleft_mv.idxmin()
     milestone = viewsleft.loc[videoid].idxmin()
     # create the mapping for the tweet template
     fillin = {
@@ -159,7 +161,7 @@ def youtube_milestone(db, dry_run=False):
         'diff': viewsleft.loc[videoid].min(),
         'milestone': MILESTONES[milestone],
         'prediction': (arrow.now()
-                       .shift(days=daysleft.loc[videoid,milestone])
+                       .shift(days=daysleft.loc[videoid])
                        .humanize()),
     }
     # fill in the template and post on Twitter
