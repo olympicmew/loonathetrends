@@ -187,7 +187,7 @@ def write_youtube(db):
         date = get_current_time().format('YYYY-MM-DD')
         record = (date, 'youtube', channelid, stats['subscriberCount'])
         c = db.cursor()
-        c.execute('INSERT INTO followers VALUES (?, ?, ?, ?)', record)
+        c.execute('INSERT OR IGNORE INTO followers VALUES (?, ?, ?, ?)', record)
         db.commit()
 
 def write_spotify(db):
@@ -199,7 +199,7 @@ def write_spotify(db):
         date = get_current_time().format('YYYY-MM-DD')
         record = (date, 'spotify', artistid, count)
         c = db.cursor()
-        c.execute('INSERT INTO followers VALUES (?, ?, ?, ?)', record)
+        c.execute('INSERT OR IGNORE INTO followers VALUES (?, ?, ?, ?)', record)
         db.commit()
 
 def write_twitter(db):
@@ -213,7 +213,7 @@ def write_twitter(db):
         date = get_current_time().format('YYYY-MM-DD')
         record = (date, 'twitter', user, count)
         c = db.cursor()
-        c.execute('INSERT INTO followers VALUES (?, ?, ?, ?)', record)
+        c.execute('INSERT OR IGNORE INTO followers VALUES (?, ?, ?, ?)', record)
         db.commit()
 
 def write_videostats(db):
