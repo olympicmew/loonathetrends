@@ -8,6 +8,8 @@ import arrow
 from .utils import get_moon_phase
 import os
 import os.path
+from asyncio import get_event_loop
+from pyppeteer import launch
 
 DBSCHEMA_PATH = os.path.join(os.path.split(__file__)[0], 'schema.sql')
 
@@ -103,7 +105,79 @@ class MelonRetriever(object):
         response = self._session.get(url, params={'artistId': artistid})
         return response.json()['fanInfo']['SUMMCNT']
 
+### UGLY PYPPETEER FETCHERS, PLEASE MAKE THEM MORE EFFICIENT DOWN THE LINE
 
+async def vlive_get_follower_count():
+    selector = 'span.cnt'
+    browser = await launch() 
+    page = await browser.newPage() 
+    await page.goto('https://channels.vlive.tv/E1F3A7/home') 
+    await page.waitForSelector(selector) 
+    count = await page.Jeval(selector, '(element) => element.innerHTML') 
+    await browser.close() 
+    return int(count.replace(',', ''))
+
+async def daumcafe_get_follower_count():
+     selector = '#cafeinfo_list > ul > li:nth-child(3) ' \
+                '> span.txt_point.num.fl > a' 
+     browser = await launch() 
+     page = await browser.newPage() 
+     await page.goto('http://cafe.daum.net/loonatheworld') 
+     for frame in page.mainFrame.childFrames: 
+         if frame.name == 'down': 
+             count = await frame.Jeval(selector,
+                                       '(element) => element.innerHTML') 
+     await browser.close() 
+     return int(count.replace(',', ''))
+
+async def instagram_get_follower_count():
+    selector = '/html/body/span/section/main/div/header/section/ul/li[2]/a/span'
+    browser = await launch() 
+    page = await browser.newPage() 
+    await page.goto('https://www.instagram.com/loonatheworld/') 
+    await page.waitForXPath(selector) 
+    element, = await page.Jx(selector) 
+    count = await page.evaluate('(element) => element.getAttribute("title")',
+                                element)
+    await browser.close() 
+    return int(count.replace(',', ''))
+
+async def melon_get_follower_count(artistid): 
+    browser = await launch() 
+    page = await browser.newPage()
+    await page.goto('https://www.melon.com/artist/' \
+                    'timeline.htm?artistId={}'.format(artistid),
+                    waitUntil='domcontentloaded') 
+    r = await page.waitForResponse('https://www.melon.com/artist/' \
+                                   'getArtistFanNTemper.json' \
+                                   '?artistId={}'.format(artistid)) 
+    json = await r.json() 
+    await browser.close() 
+    return json['fanInfo']['SUMMCNT'] 
+
+def write_vlive(db):
+    count = get_event_loop().run_until_complete(vlive_get_follower_count())
+    date = get_current_time().format('YYYY-MM-DD')
+    record = (date, 'vlive', 'E1F3A7', count)
+    c = db.cursor()
+    c.execute('INSERT INTO followers VALUES (?, ?, ?, ?)', record)
+    db.commit()
+    
+def write_daumcafe(db):
+    count = get_event_loop().run_until_complete(daumcafe_get_follower_count())
+    date = get_current_time().format('YYYY-MM-DD')
+    record = (date, 'daumcafe', 'loonatheworld', count)
+    c = db.cursor()
+    c.execute('INSERT INTO followers VALUES (?, ?, ?, ?)', record)
+    db.commit()
+
+def write_instagram(db):
+    count = get_event_loop().run_until_complete(instagram_get_follower_count())
+    date = get_current_time().format('YYYY-MM-DD')
+    record = (date, 'instagram', 'loonatheworld', count)
+    c = db.cursor()
+    c.execute('INSERT INTO followers VALUES (?, ?, ?, ?)', record)
+    db.commit()
 
 def write_youtube(db):
     channelids = os.environ['YT_CHANNELIDS'].split(':')
@@ -168,7 +242,7 @@ def write_melon(db):
     artistids = os.environ['MELON_ARTISTIDS'].split(':')
     retriever = MelonRetriever()
     for artistid in artistids:
-        count = retriever.get_fan_count(artistid)
+        count = get_event_loop().run_until_complete(melon_get_follower_count(artistid))
         date = get_current_time().format('YYYY-MM-DD')
         record = (date, 'melon', artistid, count)
         c = db.cursor()
