@@ -242,7 +242,7 @@ def write_melon(db):
     artistids = os.environ['MELON_ARTISTIDS'].split(':')
     retriever = MelonRetriever()
     for artistid in artistids:
-        count = get_event_loop().run_until_complete(melon_get_follower_count(artistid))
+        count = asyncio.run(melon_get_follower_count(artistid))
         date = get_current_time().format('YYYY-MM-DD')
         record = (date, 'melon', artistid, count)
         c = db.cursor()
