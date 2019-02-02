@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import arrow
 from . import templates, plots
-from loonathetrends.utils import get_video_title_lookup
+from loonathetrends.utils import get_video_title_lookup, get_video_ismv_lookup
 
 auth = OAuth(os.environ['TWITTER_ACCESSTOKEN'],
              os.environ['TWITTER_ACCESSSECRET'],
@@ -136,6 +136,7 @@ def youtube_milestone(db, dry_run=False):
     stats = pd.read_sql('select * from video_stats order by tstamp', db,
                         parse_dates=['tstamp'])
     mvlookup = pd.Series(get_video_ismv_lookup(db))
+    lookup = get_video_title_lookup(db)
     # get the current view counts for all videos
     views = stats.groupby('video_id')['views'].last()
     # calculate how many views are left for each milestone for all videos
@@ -158,6 +159,7 @@ def youtube_milestone(db, dry_run=False):
     fillin = {
         'date': arrow.now().format('YYYY-MM-DD'),
         'videoid': videoid,
+        'title': lookup[videoid],
         'diff': viewsleft.loc[videoid].min(),
         'milestone': MILESTONES[milestone],
         'prediction': (arrow.now()
