@@ -45,6 +45,7 @@ youtube_milestone = '''\
 #OrbitStreamingWednesday ({date}) 🤖
 
 This video needs some love:
+{title}
 ▶️ http://youtu.be/{videoid}
 
 It needs {diff:,.0f} views to reach {milestone}. It should get there {prediction}, but we can make it happen faster!
