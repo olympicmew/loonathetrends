@@ -26,27 +26,24 @@ MILESTONES = {100_000: '100k',
 
 def followers_update(db, freq, dry_run=False, post_plots=False):
     if freq == 'daily':
-        query = "SELECT * FROM followers " \
-                "WHERE tstamp = date('now') " \
-                "OR tstamp = date('now','-1 days') " \
-                "ORDER BY tstamp"
-        template = templates.followers_daily
+        ndays = 1
     elif freq == 'weekly':
-        query = "SELECT * FROM followers " \
-                "WHERE tstamp = date('now') " \
-                "OR tstamp = date('now','-7 days') " \
-                "ORDER BY tstamp"
-        template = templates.followers_weekly
+        ndays = 7
     else:
         raise RuntimeError('Parameter freq provided not valid')
+    query = "SELECT * FROM followers " \
+            "WHERE tstamp = date('now') " \
+            "OR tstamp = date('now','-{} days') " \
+            "ORDER BY tstamp".format(ndays)
+    template = templates.followers_update
     df = pd.read_sql(query, db)
     date = df['tstamp'].iloc[-1]
     grouped = df.groupby('site')
     tots = grouped.last()['count'].to_dict()
     difs = (grouped.last()['count'] - grouped.first()['count']).to_dict()
-    status = template.format(date=date, tots=tots, difs=difs)
+    status = template.format(freq=freq, date=date, tots=tots, difs=difs)
     if post_plots:
-        media = plots.new_followers(db, freq)
+        media = plots.new_followers(db)
     else:
         media = []
     if not dry_run:
@@ -57,30 +54,6 @@ def followers_update(db, freq, dry_run=False, post_plots=False):
         t.statuses.update(status=status, media_ids=','.join(media_ids))
     return status
 
-def videostats_update(db, freq, dry_run=False):
-    # build lookup table for video titles
-    lookup = get_video_title_lookup(db)
-    # find out what video to post about
-    df = pd.read_sql('select * from video_stats', db, parse_dates=['tstamp'])
-    df = df.set_index('tstamp')
-    func = lambda x: x.diff().last(freq).sum()
-    videoid = df.groupby('video_id').comments.agg(func).idxmax()
-    # get stats for the video
-    stats = df[df.video_id == videoid].drop('video_id', axis=1)
-    last = stats.index[-1]
-    trimmed_stats = stats.reindex(pd.date_range(last - pd.Timedelta(freq), last, freq='h'))
-    tots = trimmed_stats.iloc[-1].to_dict()
-    rates = trimmed_stats.diff().mean().to_dict()
-    date = arrow.get(last).format('YYYY-MM-DD ha')
-    title = lookup[videoid]
-    # make charts
-    # TODO
-    # fill template and post
-    template = templates.videostats
-    status = template.format(title=title, date=date, tots=tots, rates=rates, videoid=videoid)
-    if not dry_run:
-        t.statuses.update(status=status)
-    return status
 
 def youtube_update(db, kind, dry_run=False):
     # create DataFrame for stats
