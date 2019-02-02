@@ -8,7 +8,7 @@ import arrow
 from .utils import get_moon_phase
 import os
 import os.path
-from asyncio import get_event_loop
+import asyncio
 from pyppeteer import launch
 
 DBSCHEMA_PATH = os.path.join(os.path.split(__file__)[0], 'schema.sql')
@@ -156,7 +156,7 @@ async def melon_get_follower_count(artistid):
     return json['fanInfo']['SUMMCNT'] 
 
 def write_vlive(db):
-    count = get_event_loop().run_until_complete(vlive_get_follower_count())
+    count = asyncio.run(vlive_get_follower_count())
     date = get_current_time().format('YYYY-MM-DD')
     record = (date, 'vlive', 'E1F3A7', count)
     c = db.cursor()
@@ -164,7 +164,7 @@ def write_vlive(db):
     db.commit()
     
 def write_daumcafe(db):
-    count = get_event_loop().run_until_complete(daumcafe_get_follower_count())
+    count = asyncio.run(daumcafe_get_follower_count())
     date = get_current_time().format('YYYY-MM-DD')
     record = (date, 'daumcafe', 'loonatheworld', count)
     c = db.cursor()
@@ -172,7 +172,7 @@ def write_daumcafe(db):
     db.commit()
 
 def write_instagram(db):
-    count = get_event_loop().run_until_complete(instagram_get_follower_count())
+    count = asyncio.run(instagram_get_follower_count())
     date = get_current_time().format('YYYY-MM-DD')
     record = (date, 'instagram', 'loonatheworld', count)
     c = db.cursor()
