@@ -3,12 +3,12 @@ Social media {freq} update ({date}) 🤖
 
 YouTube: {tots[youtube]:,} ({difs[youtube]:+,}) subscribers
 Twitter: {tots[twitter]:,} ({difs[twitter]:+,}) followers
+Instagram: {tots[instagram]:,} ({difs[instagram]:+,}) followers
+Fancafe: {tots[daumcafe]:,} ({difs[daumcafe]:+,}) members
+VLIVE: {tots[vlive]:,} ({difs[vlive]:+,}) followers
 Spotify: {tots[spotify]:,} ({difs[spotify]:+,}) followers
+Melon: {tots[melon]:,} ({difs[melon]:+,}) followers
 '''
-#Instagram: {tots[instagram]:,} ({difs[instagram]:+,}) followers
-#Fancafe: {tots[daumcafe]:,} ({difs[daumcafe]:+,}) members
-#VLIVE: {tots[vlive]:,} ({difs[vlive]:+,}) followers
-#Melon: {tots[melon]:,} ({difs[melon]:+,}) followers
 
 youtube_update = '''\
 YouTube stats update ({date}) 🤖

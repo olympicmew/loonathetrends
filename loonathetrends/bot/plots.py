@@ -44,11 +44,11 @@ def new_followers(db):
     return (
             media['youtube'],
             media['twitter'],
-            #media['instagram'],
-            #media['daumcafe'],
-            #media['vlive'],
+            media['instagram'],
+            media['daumcafe'],
+            media['vlive'],
             media['spotify'],
-            #media['melon'],
+            media['melon'],
            )
 
 def youtube_update(db, videoid, metric='views'):
