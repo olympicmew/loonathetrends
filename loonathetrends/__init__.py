@@ -233,7 +233,7 @@ def write_videostats(db):
                        v['description'], v['moon_phase']))
             c.execute('INSERT OR IGNORE INTO video_stats VALUES (?, ?, 0, 0, 0, 0)',
                       (pubdate, v['id']))
-            c.execute('INSERT INTO video_stats VALUES (?, ?, ?, ?, ?, ?)',
+            c.execute('INSERT OR IGNORE INTO video_stats VALUES (?, ?, ?, ?, ?, ?)',
                       (date, v['id'], v['viewCount'], v['likeCount'],
                        v['dislikeCount'], v['commentCount']))
         db.commit()
