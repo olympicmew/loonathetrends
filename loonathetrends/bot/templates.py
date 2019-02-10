@@ -1,13 +1,13 @@
 followers_update = '''\
-Social media {freq} update ({date}) 🤖
+SNS follower counts {freq} update ({date}) 🤖
 
-YouTube: {tots[youtube]:,} ({difs[youtube]:+,}) subscribers
-Twitter: {tots[twitter]:,} ({difs[twitter]:+,}) followers
-Instagram: {tots[instagram]:,} ({difs[instagram]:+,}) followers
-Fancafe: {tots[daumcafe]:,} ({difs[daumcafe]:+,}) members
-VLIVE: {tots[vlive]:,} ({difs[vlive]:+,}) followers
-Spotify: {tots[spotify]:,} ({difs[spotify]:+,}) followers
-Melon: {tots[melon]:,} ({difs[melon]:+,}) followers
+YouTube: {tots[youtube]:,} ({difs[youtube]:+,})
+Twitter: {tots[twitter]:,} ({difs[twitter]:+,})
+Instagram: {tots[instagram]:,} ({difs[instagram]:+,})
+Fancafe: {tots[daumcafe]:,} ({difs[daumcafe]:+,})
+VLIVE: {tots[vlive]:,} ({difs[vlive]:+,})
+Spotify: {tots[spotify]:,} ({difs[spotify]:+,})
+Melon: {tots[melon]:,} ({difs[melon]:+,})
 '''
 
 youtube_update = '''\

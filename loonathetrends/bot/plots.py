@@ -20,6 +20,9 @@ def new_followers(db):
     titles = {'youtube': 'LOONA YouTube new subscribers',
               'spotify': 'LOONA Spotify new followers',
               'twitter': 'LOONA Twitter new followers',
+              'vlive': 'LOONA VLIVE new followers',
+              'instagram': 'LOONA Instagram new followers',
+              'daumcafe': 'LOONA fancafe new members',
               'melon': 'LOONA Melon new followers'}
     df = (pd.read_sql('select tstamp, site, count from followers '
                      'order by tstamp', db, parse_dates=['tstamp'])
@@ -45,10 +48,10 @@ def new_followers(db):
             media['youtube'],
             media['twitter'],
             media['instagram'],
-            media['daumcafe'],
-            media['vlive'],
+#            media['daumcafe'],
+#            media['vlive'],
             media['spotify'],
-            media['melon'],
+#            media['melon'],
            )
 
 def youtube_update(db, videoid, metric='views'):
