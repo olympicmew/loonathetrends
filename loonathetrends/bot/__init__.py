@@ -51,7 +51,22 @@ def followers_update(db, freq, dry_run=False, post_plots=False):
         for img in media:
             media_id = t_upload.media.upload(media=img)['media_id_string']
             media_ids.append(media_id)
-        t.statuses.update(status=status, media_ids=','.join(media_ids))
+        if media_ids:
+            def chunk_four(l):
+                for i in range(0, len(l), 4):
+                    yield l[i : i+4]
+            last_tweet = None
+            for chunk in chunk_four(media_ids):
+                if last_tweet == None:
+                    last_tweet = t.statuses.update(status=status,
+                                                   media_ids=','.join(chunk))
+                else:
+                    last_tweetid = last_tweet['id_str']
+                    last_tweet = t.statuses.update(status='@loonathetrends',
+                                     media_ids=','.join(chunk),
+                                     in_reply_to_status_id=last_tweetid)
+        else:
+            t.statuses.update(status=status)
     return status
 
 
