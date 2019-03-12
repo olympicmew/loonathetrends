@@ -172,6 +172,7 @@ def youtube_milestone(db, dry_run=False):
     # calculate the current view rate for all videos
     pivot = stats.pivot(index="tstamp", columns="video_id", values="views")
     rates = pivot.last("7d1h").asfreq("h").diff().mean() * 24
+    rates[rates <= 0] = None
     # calculate how many days are left to reach the milestones
     daysleft = viewsleft.apply(lambda x: x / rates).min(axis=1)
     # find out the featured video for today
