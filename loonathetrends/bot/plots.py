@@ -45,7 +45,7 @@ def new_followers(db):
     media = {}
     for site, stats in grouped["count"]:
         stats = stats.asfreq("d")  # make sure to have days with no measurements
-        stats = stats.last("30d")
+        stats = stats.last("148d")
         stats = stats.diff()  # get gain instead of cumulative followers
         # create plot
         fig, ax = plt.subplots()
@@ -54,7 +54,7 @@ def new_followers(db):
             title=titles[site],
             style=".-",
             markersize=14,
-            figsize=(max(7, len(stats) / 3), 5),
+            figsize=(10, 5),
         )
         ax.set_xlabel("")
         _add_thousand_sep(ax)
