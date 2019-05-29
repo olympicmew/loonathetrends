@@ -101,9 +101,14 @@ def youtube_update(db, kind, dry_run=False):
     # find out what video to post about
     func = lambda x: x.diff().last("7d").sum()
     if kind == "latest":
-        videoid = pd.read_sql(
-            "SELECT published_at, video_id FROM videos ORDER BY published_at", db
-        ).set_index("video_id").loc[mvlookup].index[-1]
+        videoid = (
+            pd.read_sql(
+                "SELECT published_at, video_id FROM videos ORDER BY published_at", db
+            )
+            .set_index("video_id")
+            .loc[mvlookup]
+            .index[-1]
+        )
     elif kind == "views":
         videoid = allstats.groupby("video_id")["views"].agg(func).idxmax()
     elif kind == "likes":
@@ -168,7 +173,7 @@ def youtube_milestone(db, dry_run=False):
     viewsleft = pd.DataFrame(
         columns=MILESTONES, data=marray - varray, index=views.index
     )
-    viewsleft = viewsleft[viewsleft > 0]  # discard reached milestones
+    viewsleft[viewsleft <= 0] = None  # discard reached milestones
     # calculate the current view rate for all videos
     pivot = stats.pivot(index="tstamp", columns="video_id", values="views")
     rates = pivot.last("7d1h").asfreq("h").diff().mean() * 24

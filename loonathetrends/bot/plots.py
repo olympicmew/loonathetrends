@@ -52,7 +52,6 @@ def new_followers(db):
         stats.plot(
             ax=ax,
             title=titles[site],
-            style=".-",
             markersize=14,
             figsize=(10, 5),
         )
@@ -88,7 +87,7 @@ def youtube_update(db, videoid, metric="views"):
 
     # calculate moving averages
     df = pd.DataFrame(stats[metric])
-    df = df.assign(avg_d=df.rolling('1d').mean(), avg_w=df.rolling('7d').mean())
+    df = df.assign(avg_d=df.rolling("1d").mean(), avg_w=df.rolling("7d").mean())
     # trim to last 30 days
     df = df.last("30d")
     # decide what to plot

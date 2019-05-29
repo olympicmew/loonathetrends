@@ -119,7 +119,7 @@ class MelonRetriever(object):
 
 
 async def vlive_get_follower_count():
-    selector = "span.cnt"
+    selector = "span.value"
     browser = await launch()
     page = await browser.newPage()
     await page.goto("https://channels.vlive.tv/E1F3A7/home")

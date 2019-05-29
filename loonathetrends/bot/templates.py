@@ -1,14 +1,14 @@
-followers_update = """\
-{date} SNS follower counts {freq} update 🤖
-
-YouTube: {tots[youtube]:,} ({difs[youtube]:+,})
-Twitter: {tots[twitter]:,} ({difs[twitter]:+,})
-Instagram: {tots[instagram]:,} ({difs[instagram]:+,})
-Fancafe: {tots[daumcafe]:,} ({difs[daumcafe]:+,})
-VLIVE: {tots[vlive]:,} ({difs[vlive]:+,})
-Spotify: {tots[spotify]:,} ({difs[spotify]:+,})
-Melon: {tots[melon]:,} ({difs[melon]:+,})
-"""
+followers_update = (
+    "{date} SNS follower counts {freq} update 🤖\n"
+    "\n"
+    "YouTube: {tots[youtube]:,} ({difs[youtube]:+,})\n"
+    "Twitter: {tots[twitter]:,} ({difs[twitter]:+,})\n"
+    "Instagram: {tots[instagram]:,} ({difs[instagram]:+,})\n"
+    "Fancafe: {tots[daumcafe]:,} ({difs[daumcafe]:+,})\n"
+    "VLIVE: {tots[vlive]:,} ({difs[vlive]:+,})\n"
+    "Spotify: {tots[spotify]:,} ({difs[spotify]:+,})\n"
+    "Melon: {tots[melon]:,} ({difs[melon]:+,})\n"
+)
 
 youtube_update = """\
 {date} YouTube stats update 🤖
@@ -17,10 +17,10 @@ youtube_update = """\
 {title}
 ▶️ http://youtu.be/{videoid}
 
-👁️: {tots[views]:,.0f} ({rates[views]:,.1f} views/day)
-❤️: {tots[likes]:,.0f} ({rates[likes]:,.1f} likes/day)
-💔: {tots[dislikes]:,.0f} ({rates[dislikes]:,.1f} dislikes/day)
-💬: {tots[comments]:,.0f} ({rates[comments]:,.1f} comments/day)
+👁️ {tots[views]:,.0f} ({rates[views]:,.0f})
+❤️ {tots[likes]:,.0f} ({rates[likes]:,.0f})
+💔 {tots[dislikes]:,.0f} ({rates[dislikes]:,.0f})
+💬 {tots[comments]:,.0f} ({rates[comments]:,.0f})
 """
 
 youtube_milestone = """\
