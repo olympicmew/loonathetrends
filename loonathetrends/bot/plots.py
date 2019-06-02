@@ -47,6 +47,9 @@ def new_followers(db):
         stats = stats.asfreq("d")  # make sure to have days with no measurements
         stats = stats.last("148d")
         stats = stats.diff()  # get gain instead of cumulative followers
+        # special case for Instagram data
+        if site == 'instagram':
+            stats['2019-02-13':'2019-02-14'] = None
         # create plot
         fig, ax = plt.subplots()
         stats.plot(
