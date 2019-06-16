@@ -92,7 +92,7 @@ def followers_update(db, freq, dry_run=False, post_plots=False):
 
 def youtube_update(db, kind, dry_run=False):
     # create DataFrame for stats
-    allstats = pd.read_sql(
+    stats = pd.read_sql(
         "SELECT * FROM video_stats ORDER BY tstamp", db, parse_dates=["tstamp"]
     ).set_index("tstamp")
     lookup = get_video_title_lookup(db)
@@ -110,14 +110,14 @@ def youtube_update(db, kind, dry_run=False):
             .index[-1]
         )
     elif kind == "views":
-        videoid = allstats.groupby("video_id")["views"].agg(func).idxmax()
+        videoid = stats.groupby("video_id")["views"].agg(func).idxmax()
     elif kind == "likes":
-        videoid = allstats.groupby("video_id")["likes"].agg(func).idxmax()
+        videoid = stats.groupby("video_id")["likes"].agg(func).idxmax()
     elif kind == "comments":
-        videoid = allstats.groupby("video_id")["comments"].agg(func).idxmax()
+        videoid = stats.groupby("video_id")["comments"].agg(func).idxmax()
 
     # get and trim stats
-    stats = allstats[allstats.video_id == videoid].drop("video_id", axis=1)
+    stats = stats[stats.video_id == videoid].drop("video_id", axis=1)
     last = stats.index[-1]
     length = pd.Timedelta("1d")
     trimmed = stats.reindex(pd.date_range(last - length, last, freq="h"))
