@@ -48,16 +48,11 @@ def new_followers(db):
         stats = stats.last("148d")
         stats = stats.diff()  # get gain instead of cumulative followers
         # special case for Instagram data
-        if site == 'instagram':
-            stats['2019-02-13':'2019-02-14'] = None
+        if site == "instagram":
+            stats["2019-02-13":"2019-02-14"] = None
         # create plot
         fig, ax = plt.subplots()
-        stats.plot(
-            ax=ax,
-            title=titles[site],
-            markersize=14,
-            figsize=(10, 5),
-        )
+        stats.plot(ax=ax, title=titles[site], markersize=14, figsize=(10, 5))
         ax.set_xlabel("")
         _add_thousand_sep(ax)
         _add_watermark(fig)

@@ -202,3 +202,55 @@ def youtube_milestone(db, dry_run=False):
     if not dry_run:
         t.statuses.update(status=status)
     return status
+
+
+def youtube_milestone_reached(db, dry_run=False):
+    videos = pd.read_sql(
+        "select video_id, title, published_at from videos",
+        db,
+        parse_dates=["published_at"],
+    ).values
+    for video_id, title, published_at in videos:
+        age = pd.to_datetime("now") - published_at
+        if age < pd.Timedelta("3d"):
+            continue
+        elif age < pd.Timedelta("7d"):
+            window = 72
+        elif age < pd.Timedelta("28d"):
+            window = 168
+        else:
+            window = 672
+
+        stats = pd.read_sql(
+            (
+                f"select tstamp, views from video_stats "
+                f"where video_id = {repr(video_id)} order by tstamp"
+            ),
+            db,
+            parse_dates=["tstamp"],
+            index_col="tstamp",
+        ).tz_localize("Asia/Seoul")
+        try:
+            now = arrow.now().floor("hour")
+            past = now.shift(hours=-1)
+            vt_now = stats.views.loc[now.datetime]
+            vt_past = stats.views.loc[past.datetime]
+            delta = stats.diff(window).views.iloc[-1]
+        except KeyError:
+            continue
+        a = 10 ** round(np.log10(delta))
+        if a < 100_000:
+            continue
+
+        if (vt_now // a) > (vt_past // a):
+            fillin = {"videoid": video_id, "title": title, "views": vt_now // a * a}
+            template = templates.youtube_milestone_reached
+            status = template.format(**fillin)
+            status_len = len(unicodedata.normalize("NFC", status))
+            if status_len > 280:
+                raise RuntimeError(
+                    f"The status update is {status_len} characters long."
+                )
+            if not dry_run:
+                t.statuses.update(status=status)
+            return status

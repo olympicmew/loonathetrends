@@ -32,3 +32,15 @@ This video needs some love:
 
 It needs {diff:,.0f} views to reach {milestone}. It should get there {prediction}, but we can make it happen faster!
 """
+
+
+youtube_milestone_reached = """\
+YouTube milestone bulletin 🤖
+
+This @loonatheworld video:
+{title}
+▶️ http://youtu.be/{videoid}
+
+has finally reached {views:,.0f} views! 🎊
+Congratulations Orbits! 🎉 Keep going~
+"""
