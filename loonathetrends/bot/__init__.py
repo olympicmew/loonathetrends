@@ -30,6 +30,10 @@ MILESTONES = {
 }
 
 
+def _status_length(status):
+    return len(unicodedata.normalize("NFC", status))
+
+
 def followers_update(db, freq, dry_run=False, post_plots=False):
     if freq == "daily":
         ndays = 1
@@ -50,8 +54,7 @@ def followers_update(db, freq, dry_run=False, post_plots=False):
     tots = grouped.last()["count"].to_dict()
     difs = (grouped.last()["count"] - grouped.first()["count"]).to_dict()
     status = template.format(freq=freq, date=date, tots=tots, difs=difs)
-    status_len = len(unicodedata.normalize("NFC", status))
-    if status_len > 280:
+    if _status_length(status) > 280:
         raise RuntimeError(f"The status update is {status_len} characters long.")
     if post_plots:
         media = plots.new_followers(db)
@@ -92,15 +95,19 @@ def followers_update(db, freq, dry_run=False, post_plots=False):
 
 def youtube_update(db, kind, dry_run=False):
     # create DataFrame for stats
-    allstats = pd.read_sql(
-        "SELECT * FROM video_stats ORDER BY tstamp", db, parse_dates=["tstamp"]
+    stats = pd.read_sql(
+        "SELECT * FROM video_stats WHERE "
+        "tstamp >= date('now', '-8 days', 'localtime') "
+        "ORDER BY tstamp",
+        db,
+        parse_dates=["tstamp"],
     ).set_index("tstamp")
     lookup = get_video_title_lookup(db)
-    mvlookup = pd.Series(get_video_ismv_lookup(db))
 
     # find out what video to post about
     func = lambda x: x.diff().last("7d").sum()
     if kind == "latest":
+        mvlookup = pd.Series(get_video_ismv_lookup(db))
         videoid = (
             pd.read_sql(
                 "SELECT published_at, video_id FROM videos ORDER BY published_at", db
@@ -110,14 +117,14 @@ def youtube_update(db, kind, dry_run=False):
             .index[-1]
         )
     elif kind == "views":
-        videoid = allstats.groupby("video_id")["views"].agg(func).idxmax()
+        videoid = stats.groupby("video_id")["views"].agg(func).idxmax()
     elif kind == "likes":
-        videoid = allstats.groupby("video_id")["likes"].agg(func).idxmax()
+        videoid = stats.groupby("video_id")["likes"].agg(func).idxmax()
     elif kind == "comments":
-        videoid = allstats.groupby("video_id")["comments"].agg(func).idxmax()
+        videoid = stats.groupby("video_id")["comments"].agg(func).idxmax()
 
     # get and trim stats
-    stats = allstats[allstats.video_id == videoid].drop("video_id", axis=1)
+    stats = stats[stats.video_id == videoid].drop("video_id", axis=1)
     last = stats.index[-1]
     length = pd.Timedelta("1d")
     trimmed = stats.reindex(pd.date_range(last - length, last, freq="h"))
@@ -147,8 +154,7 @@ def youtube_update(db, kind, dry_run=False):
         rates=rates,
         videoid=videoid,
     )
-    status_len = len(unicodedata.normalize("NFC", status))
-    if status_len > 280:
+    if _status_length(status) > 280:
         raise RuntimeError(f"The status update is {status_len} characters long.")
 
     # post on twitter
@@ -161,7 +167,11 @@ def youtube_update(db, kind, dry_run=False):
 def youtube_milestone(db, dry_run=False):
     # get the stats
     stats = pd.read_sql(
-        "select * from video_stats order by tstamp", db, parse_dates=["tstamp"]
+        "SELECT * FROM video_stats WHERE "
+        "tstamp >= date('now', '-8 days', 'localtime') "
+        "ORDER BY tstamp",
+        db,
+        parse_dates=["tstamp"],
     )
     mvlookup = pd.Series(get_video_ismv_lookup(db))
     lookup = get_video_title_lookup(db)
@@ -196,8 +206,7 @@ def youtube_milestone(db, dry_run=False):
     # fill in the template and post on Twitter
     template = templates.youtube_milestone
     status = template.format(**fillin)
-    status_len = len(unicodedata.normalize("NFC", status))
-    if status_len > 280:
+    if _status_length(status) > 280:
         raise RuntimeError(f"The status update is {status_len} characters long.")
     if not dry_run:
         t.statuses.update(status=status)
