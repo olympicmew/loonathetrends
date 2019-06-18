@@ -250,14 +250,18 @@ def youtube_milestone_reached(db, dry_run=False):
             delta = stats.diff(window).views.iloc[-1]
         except KeyError:
             continue
-        a = 10 ** round(np.log10(delta))
-        if a < 100_000:
+        a = round(np.log10(delta))
+        if a < 5:
             continue
-
-        if (vt_now // a) > (vt_past // a):
-            fillin = {"videoid": video_id, "title": title, "views": vt_now // a * a}
+        if (vt_now // (10 ** a)) > (vt_past // (10 ** a)):
+            fillin = {
+                "videoid": video_id,
+                "title": title,
+                "views": (vt_now // 10 ** a) * (10 ** a),
+                "celebration": a >= (round(np.log10(vt_now)) - 1),
+            }
             template = templates.youtube_milestone_reached
-            status = template.format(**fillin)
+            status = template(**fillin)
             status_len = len(unicodedata.normalize("NFC", status))
             if status_len > 280:
                 raise RuntimeError(
@@ -286,7 +290,9 @@ def youtube_statsdelivery(db, dry_run=False):
             )
             db.commit()
         match = re.search(
-            r"show me (?:the )?(stats|views|comments|likes|dislikes|money|m(?:o|oe|ö)bius)", tweet["text"], re.IGNORECASE
+            r"show me (?:the )?(stats|views|comments|likes|dislikes|money|m(?:o|oe|ö)bius)",
+            tweet["text"],
+            re.IGNORECASE,
         )
         if match:
             for url in tweet["entities"]["urls"]:
