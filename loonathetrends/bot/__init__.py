@@ -1,4 +1,5 @@
 import os
+import re
 import unicodedata
 from twitter import OAuth, Twitter
 import numpy as np
@@ -28,6 +29,8 @@ MILESTONES = {
     50_000_000: "50M",
     100_000_000: "100M",
 }
+
+REGEX_YOUTUBEURL = r"(?:.+?)?(?:\/v\/|watch\/|\?v=|\&v=|youtu\.be\/|\/v=|^youtu\.be\/)([a-zA-Z0-9_-]{11})+"
 
 
 def _status_length(status):
@@ -136,7 +139,7 @@ def youtube_update(db, kind, dry_run=False):
     date = arrow.get(last).format("YYMMDD")
 
     # make charts
-    media = plots.youtube_update(db, videoid)
+    media = plots.youtube(db, videoid)
 
     # fill template
     kind_template = {
@@ -263,3 +266,66 @@ def youtube_milestone_reached(db, dry_run=False):
             if not dry_run:
                 t.statuses.update(status=status)
             return status
+
+
+def youtube_statsdelivery(db, dry_run=False):
+    lookup = get_video_title_lookup(db)
+    last_mention = db.execute(
+        "SELECT value FROM registry WHERE key='last_mention_id'"
+    ).fetchone()
+    if last_mention:
+        mentions = t.statuses.mentions_timeline(since_id=last_mention[0])
+    else:
+        mentions = t.statuses.mentions_timeline()
+    for tweet in reversed(mentions):
+        tweet_id = tweet["id_str"]
+        if not dry_run:
+            db.execute(
+                "INSERT OR REPLACE INTO registry VALUES ('last_mention_id', ?)",
+                [tweet_id],
+            )
+            db.commit()
+        match = re.search(
+            r"show me (?:the )?(stats|views|comments|likes|dislikes|money|m(?:o|oe|ö)bius)", tweet["text"], re.IGNORECASE
+        )
+        if match:
+            for url in tweet["entities"]["urls"]:
+                urlmatch = re.search(REGEX_YOUTUBEURL, url["expanded_url"])
+                if urlmatch:
+                    urlfound = True
+                    videoid = urlmatch.group(1)
+                    break
+            else:
+                urlfound = False
+                videoid = None
+                media = None
+                if match.group(1) == "money":
+                    template = templates.youtube_statsdelivery_smtm
+                elif "bius" in match.group(1):
+                    template = templates.youtube_statsdelivery_moebius
+                else:
+                    template = templates.youtube_statsdelivery_nourl
+            if urlfound and lookup.get(videoid):
+                metric = match.group(1)
+                if metric == "stats":
+                    metric = "views"
+                media = plots.youtube(db, videoid, metric=metric)
+                template = templates.youtube_statsdelivery
+            elif urlfound:
+                media = None
+                template = templates.youtube_statsdelivery_noloona
+            fillin = {"user": tweet["user"]["screen_name"]}
+            status = template.format(**fillin)
+            if not dry_run:
+                if media:
+                    media_id = t_upload.media.upload(media=media)["media_id_string"]
+                t.statuses.update(
+                    status=status,
+                    in_reply_to_status_id=tweet_id,
+                    auto_populate_reply_metadata=True,
+                    media_ids=media_id if media else "",
+                )
+            elif media:
+                with open(f"delivery-{tweet_id}.png", "wb") as f:
+                    f.write(media)
+            yield status

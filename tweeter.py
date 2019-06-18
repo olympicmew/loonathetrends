@@ -52,6 +52,12 @@ elif args.type == "youtube-milestone-reached":
         print(status)
     else:
         logging.info(status)
+elif args.type == "youtube-statsdelivery":
+    for status in lttbot.youtube_statsdelivery(db, args.dry_run):
+        if args.dry_run:
+            print(status)
+        else:
+            logging.info(status)
 elif re.match(r"youtube-(?P<kind>\S+)", args.type):
     kind = re.match(r"youtube-(?P<kind>\S+)", args.type).group("kind")
     status = lttbot.youtube_update(db, kind, args.dry_run)
@@ -59,3 +65,4 @@ elif re.match(r"youtube-(?P<kind>\S+)", args.type):
         print(status)
     else:
         logging.info(status)
+

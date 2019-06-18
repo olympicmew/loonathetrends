@@ -44,3 +44,9 @@ This @loonatheworld video:
 has finally reached {views:,.0f} views! 🎊
 Congratulations Orbits! 🎉 Keep going~
 """
+
+youtube_statsdelivery = "@{user} Bleep bloop! You're served 🤖"
+youtube_statsdelivery_nourl = "@{user} I think you forgot the YouTube link! 🤖"
+youtube_statsdelivery_noloona = "@{user} I only have stats for LOONA videos, sorry! 🤖"
+youtube_statsdelivery_smtm = "@{user} 😏 https://youtu.be/or6EBU-gKww"
+youtube_statsdelivery_moebius = "@{user} Bleep bloop! You're served 🤖 https://youtu.be/DeoZhYJEn7o"

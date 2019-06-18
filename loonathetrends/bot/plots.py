@@ -70,7 +70,7 @@ def new_followers(db):
     )
 
 
-def youtube_update(db, videoid, metric="views"):
+def youtube(db, videoid, metric="views", timeframe='short'):
     # get stats and clean up
     stats = pd.read_sql(
         "select * from video_stats where video_id=? order by tstamp",
@@ -85,11 +85,18 @@ def youtube_update(db, videoid, metric="views"):
 
     # calculate moving averages
     df = pd.DataFrame(stats[metric])
-    df = df.assign(avg_d=df.rolling("1d").mean(), avg_w=df.rolling("7d").mean())
-    # trim to last 30 days
-    df = df.last("30d")
+    if timeframe == "medium":
+        df = df.resample("d").mean()
+        df = df.assign(avg_w=df.rolling("7d").mean(), avg_m=df.rolling("28d").mean())
+    else:
+        df = df.assign(avg_d=df.rolling("1d").mean(), avg_w=df.rolling("7d").mean())
+    # trim depending on timeframe
+    if timeframe == "medium":
+        df = df.last("168d")
+    else:
+        df = df.last("28d")
     # decide what to plot
-    if len(stats) <= 24 * 3:
+    if len(stats) <= 24 * 3 or (len(stats) <= 24 * 21 and timeframe == "medium"):
         y = [metric]
         style = ["-"]
         has_legend = False
@@ -98,11 +105,27 @@ def youtube_update(db, videoid, metric="views"):
         style = [".", "-"]
         has_legend = True
         labels = ["Hourly measurements", "Daily average"]
+    elif len(stats) <= 24 * 84:
+        if timeframe == "medium":
+            y = [metric, "avg_w"]
+            style = ["-", "-"]
+            has_legend = True
+            labels = ["Daily average", "Weekly average"]
+        else:
+            y = [metric, "avg_d", "avg_w"]
+            style = [".", "-", "-"]
+            has_legend = True
+            labels = ["Hourly measurements", "Daily average", "Weekly average"]
     else:
-        y = [metric, "avg_d", "avg_w"]
-        style = [".", "-", "-"]
         has_legend = True
-        labels = ["Hourly measurements", "Daily average", "Weekly average"]
+        if timeframe == "medium":
+            y = [metric, "avg_w", "avg_m"]
+            style = ["-", "-", "-"]
+            labels = ["Daily average", "Weekly average", "Monthly average"]
+        else:
+            y = [metric, "avg_d", "avg_w"]
+            style = [".", "-", "-"]
+            labels = ["Hourly measurements", "Daily average", "Weekly average"]
     # check whether to draw log plot
     islog = (df[metric].std() / df[metric].mean()) >= 1.5
 
