@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS `videos` (
 	`title`	TEXT NOT NULL,
 	`published_at`	TEXT,
 	`description`	TEXT,
-	'moon_phase'	REAL,
+	`moon_phase`	REAL,
 	PRIMARY KEY(`videoid`)
 );
 CREATE TABLE IF NOT EXISTS `video_stats` (
@@ -22,5 +22,10 @@ CREATE TABLE IF NOT EXISTS `followers` (
 	`resource_id`	TEXT NOT NULL,
 	`count`	INTEGER NOT NULL,
 	PRIMARY KEY(`site`,`resource_id`,`tstamp`)
+);
+CREATE TABLE IF NOT EXISTS `registry` (
+	`key` TEXT,
+	`value` TEXT,
+	PRIMARY KEY(`key`)
 );
 COMMIT;
