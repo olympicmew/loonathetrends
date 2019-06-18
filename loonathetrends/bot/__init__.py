@@ -56,7 +56,7 @@ def followers_update(db, freq, dry_run=False, post_plots=False):
     grouped = df.groupby("site")
     tots = grouped.last()["count"].to_dict()
     difs = (grouped.last()["count"] - grouped.first()["count"]).to_dict()
-    status = template.format(freq=freq, date=date, tots=tots, difs=difs)
+    status = template(freq=freq, date=date, tots=tots, difs=difs)
     if _status_length(status) > 280:
         raise RuntimeError(f"The status update is {status_len} characters long.")
     if post_plots:
@@ -149,7 +149,7 @@ def youtube_update(db, kind, dry_run=False):
         "comments": "Most commented video this week:",
     }
     template = templates.youtube_update
-    status = template.format(
+    status = template(
         kind=kind_template[kind],
         title=title,
         date=date,
@@ -208,7 +208,7 @@ def youtube_milestone(db, dry_run=False):
     }
     # fill in the template and post on Twitter
     template = templates.youtube_milestone
-    status = template.format(**fillin)
+    status = template(**fillin)
     if _status_length(status) > 280:
         raise RuntimeError(f"The status update is {status_len} characters long.")
     if not dry_run:
@@ -321,7 +321,7 @@ def youtube_statsdelivery(db, dry_run=False):
                 media = None
                 template = templates.youtube_statsdelivery_noloona
             fillin = {"user": tweet["user"]["screen_name"]}
-            status = template.format(**fillin)
+            status = template(**fillin)
             if not dry_run:
                 if media:
                     media_id = t_upload.media.upload(media=media)["media_id_string"]
