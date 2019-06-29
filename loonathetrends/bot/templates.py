@@ -10,18 +10,20 @@ followers_update = (
     "Melon: {tots[melon]:,} ({difs[melon]:+,})\n"
 ).format
 
-youtube_update = """\
-{date} YouTube stats update 🤖
-
-{kind}
-{title}
-▶️ http://youtu.be/{videoid}
-
-👁️ {tots[views]:,.0f} ({rates[views]:,.0f})
-❤️ {tots[likes]:,.0f} ({rates[likes]:,.0f})
-💔 {tots[dislikes]:,.0f} ({rates[dislikes]:,.0f})
-💬 {tots[comments]:,.0f} ({rates[comments]:,.0f})
-""".format
+youtube_update = "\n".join(
+    (
+        "{date} YouTube stats update 🤖",
+        "",
+        "{kind}",
+        "{title}",
+        "▶️ http://youtu.be/{videoid}",
+        "",
+        "👁️ {tots[views]:,.0f} ({rates[views]:,.0f})",
+        "❤️ {tots[likes]:,.0f} ({rates[likes]:,.0f})",
+        # "💔 {tots[dislikes]:,.0f} ({rates[dislikes]:,.0f})",
+        "💬 {tots[comments]:,.0f} ({rates[comments]:,.0f})",
+    )
+).format
 
 youtube_milestone = """\
 {date} #OrbitStreamingWednesday 🤖
