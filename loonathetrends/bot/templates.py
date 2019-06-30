@@ -1,5 +1,5 @@
 followers_update = (
-    "{date} SNS follower counts {freq} update 🤖\n"
+    "{date} @loonatheworld SNS follower counts {freq} update 🤖\n"
     "\n"
     "YouTube: {tots[youtube]:,} ({difs[youtube]:+,})\n"
     "Twitter: {tots[twitter]:,} ({difs[twitter]:+,})\n"
@@ -28,7 +28,7 @@ youtube_update = "\n".join(
 youtube_milestone = """\
 {date} #OrbitStreamingWednesday 🤖
 
-This video needs some love:
+This @loonatheworld video needs some love:
 {title}
 ▶️ http://youtu.be/{videoid}
 

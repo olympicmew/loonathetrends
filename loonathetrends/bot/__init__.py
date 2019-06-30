@@ -143,10 +143,10 @@ def youtube_update(db, kind, dry_run=False):
 
     # fill template
     kind_template = {
-        "latest": "Latest MV from @loonatheworld:",
-        "views": "Most viewed video this week:",
-        "likes": "Most liked video this week:",
-        "comments": "Most commented video this week:",
+        "latest": "Latest @loonatheworld music video:",
+        "views": "Most viewed @loonatheworld video this week:",
+        "likes": "Most liked @loonatheworld video this week:",
+        "comments": "Most commented @loonatheworld video this week:",
     }
     template = templates.youtube_update
     status = template(
