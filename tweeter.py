@@ -2,7 +2,7 @@ import os
 import re
 import argparse
 import logging
-import sqlite3
+import psycopg2
 import loonathetrends.bot as lttbot
 
 DBPATH = os.environ["DBPATH"]
@@ -19,7 +19,7 @@ logging.basicConfig(
     format="%(asctime)s:%(levelname)s:%(message)s",
 )
 
-db = sqlite3.connect(DBPATH)
+db = psycopg2.connect(DBPATH)
 logging.info("Database connected")
 
 if args.type == "followers-daily":

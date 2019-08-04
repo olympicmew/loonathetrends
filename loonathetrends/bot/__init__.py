@@ -46,12 +46,12 @@ def followers_update(db, freq, dry_run=False, post_plots=False):
         raise RuntimeError("Parameter freq provided not valid")
     query = (
         "SELECT * FROM followers "
-        "WHERE tstamp = date('now') "
-        "OR tstamp = date('now','-{} days') "
-        "ORDER BY tstamp".format(ndays)
+        "WHERE tstamp = current_date "
+        "OR tstamp >= current_date - %s "
+        "ORDER BY tstamp"
     )
     template = templates.followers_update
-    df = pd.read_sql(query, db)
+    df = pd.read_sql(query, db, params=(ndays,))
     date = arrow.get(df["tstamp"].iloc[-1]).format("YYMMDD")
     grouped = df.groupby("site")
     tots = grouped.last()["count"].to_dict()
@@ -100,7 +100,7 @@ def youtube_update(db, kind, dry_run=False):
     # create DataFrame for stats
     stats = pd.read_sql(
         "SELECT * FROM video_stats WHERE "
-        "tstamp >= date('now', '-8 days', 'localtime') "
+        "tstamp >= (current_date - 8)"
         "ORDER BY tstamp",
         db,
         parse_dates=["tstamp"],
@@ -171,7 +171,7 @@ def youtube_milestone(db, dry_run=False):
     # get the stats
     stats = pd.read_sql(
         "SELECT * FROM video_stats WHERE "
-        "tstamp >= date('now', '-8 days', 'localtime') "
+        "tstamp >= (current_date - 8) "
         "ORDER BY tstamp",
         db,
         parse_dates=["tstamp"],
@@ -235,10 +235,10 @@ def youtube_milestone_reached(db, dry_run=False):
 
         stats = pd.read_sql(
             (
-                f"select tstamp, views from video_stats "
-                f"where video_id = {repr(video_id)} order by tstamp"
+                "select tstamp, views from video_stats "
+                "where video_id = %(video_id)s order by tstamp"
             ),
-            db,
+            db, params={'video_id': video_id},
             parse_dates=["tstamp"],
             index_col="tstamp",
         ).tz_localize("Asia/Seoul")
@@ -274,7 +274,8 @@ def youtube_milestone_reached(db, dry_run=False):
 
 def youtube_statsdelivery(db, dry_run=False):
     lookup = get_video_title_lookup(db)
-    last_mention = db.execute(
+    c = db.cursor()
+    last_mention = c.execute(
         "SELECT value FROM registry WHERE key='last_mention_id'"
     ).fetchone()
     if last_mention:
@@ -284,8 +285,9 @@ def youtube_statsdelivery(db, dry_run=False):
     for tweet in reversed(mentions):
         tweet_id = tweet["id_str"]
         if not dry_run:
-            db.execute(
-                "INSERT OR REPLACE INTO registry VALUES ('last_mention_id', ?)",
+            c.execute(
+                "INSERT INTO registry VALUES ('last_mention_id', %s) ON CONFLICT (key) "
+                "DO UPDATE SET value = EXCLUDED.value",
                 [tweet_id],
             )
             db.commit()

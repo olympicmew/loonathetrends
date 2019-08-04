@@ -3,7 +3,7 @@ import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials as SCC
 import twitter
 import requests
-import sqlite3
+import psycopg2
 import arrow
 from .utils import get_moon_phase
 import os
@@ -175,7 +175,7 @@ def write_vlive(db):
     date = get_current_time().format("YYYY-MM-DD")
     record = (date, "vlive", "E1F3A7", count)
     c = db.cursor()
-    c.execute("INSERT INTO followers VALUES (?, ?, ?, ?)", record)
+    c.execute("INSERT INTO followers VALUES (%s, %s, %s, %s)", record)
     db.commit()
 
 
@@ -184,7 +184,7 @@ def write_daumcafe(db):
     date = get_current_time().format("YYYY-MM-DD")
     record = (date, "daumcafe", "loonatheworld", count)
     c = db.cursor()
-    c.execute("INSERT INTO followers VALUES (?, ?, ?, ?)", record)
+    c.execute("INSERT INTO followers VALUES (%s, %s, %s, %s)", record)
     db.commit()
 
 
@@ -193,7 +193,7 @@ def write_instagram(db):
     date = get_current_time().format("YYYY-MM-DD")
     record = (date, "instagram", "loonatheworld", count)
     c = db.cursor()
-    c.execute("INSERT INTO followers VALUES (?, ?, ?, ?)", record)
+    c.execute("INSERT INTO followers VALUES (%s, %s, %s, %s)", record)
     db.commit()
 
 
@@ -205,7 +205,7 @@ def write_youtube(db):
         date = get_current_time().format("YYYY-MM-DD")
         record = (date, "youtube", channelid, stats["subscriberCount"])
         c = db.cursor()
-        c.execute("INSERT OR IGNORE INTO followers VALUES (?, ?, ?, ?)", record)
+        c.execute("INSERT INTO followers VALUES (%s, %s, %s, %s) ON CONFLICT (site, resource_id, tstamp) DO NOTHING", record)
         db.commit()
 
 
@@ -219,7 +219,7 @@ def write_spotify(db):
         date = get_current_time().format("YYYY-MM-DD")
         record = (date, "spotify", artistid, count)
         c = db.cursor()
-        c.execute("INSERT OR IGNORE INTO followers VALUES (?, ?, ?, ?)", record)
+        c.execute("INSERT INTO followers VALUES (%s, %s, %s, %s) ON CONFLICT (site, resource_id, tstamp) DO NOTHING", record)
         db.commit()
 
 
@@ -236,7 +236,7 @@ def write_twitter(db):
         date = get_current_time().format("YYYY-MM-DD")
         record = (date, "twitter", user, count)
         c = db.cursor()
-        c.execute("INSERT OR IGNORE INTO followers VALUES (?, ?, ?, ?)", record)
+        c.execute("INSERT INTO followers VALUES (%s, %s, %s, %s) ON CONFLICT (site, resource_id, tstamp) DO NOTHING", record)
         db.commit()
 
 
@@ -253,9 +253,10 @@ def write_videostats(db):
                 arrow.get(v["published_at"]).to("Asia/Seoul").format("YYYY-MM-DD HH:00")
             )
             c.execute(
-                "INSERT OR IGNORE INTO videos"
+                "INSERT INTO videos"
                 "(video_id, title, published_at, description, moon_phase)"
-                "VALUES (?, ?, ?, ?, ?)",
+                "VALUES (%s, %s, %s, %s, %s) ON CONFLICT (video_id) DO UPDATE "
+                "SET (title, description) = (EXCLUDED.title, EXCLUDED.description)",
                 (
                     v.get("id"),
                     v.get("title"),
@@ -265,11 +266,11 @@ def write_videostats(db):
                 ),
             )
             c.execute(
-                "INSERT OR IGNORE INTO video_stats VALUES (?, ?, 0, 0, 0, 0)",
+                "INSERT INTO video_stats VALUES (%s, %s, 0, 0, 0, 0) ON CONFLICT (video_id, tstamp) DO NOTHING",
                 (pubdate, v["id"]),
             )
             c.execute(
-                "INSERT OR IGNORE INTO video_stats VALUES (?, ?, ?, ?, ?, ?)",
+                "INSERT INTO video_stats VALUES (%s, %s, %s, %s, %s, %s)",
                 (
                     date,
                     v.get("id"),
@@ -290,7 +291,7 @@ def write_melon(db):
         date = get_current_time().format("YYYY-MM-DD")
         record = (date, "melon", artistid, count)
         c = db.cursor()
-        c.execute("INSERT INTO followers VALUES (?, ?, ?, ?)", record)
+        c.execute("INSERT INTO followers VALUES (%s, %s, %s, %s)", record)
         db.commit()
 
 
@@ -304,13 +305,6 @@ def write_spotify_popularity(db):
         date = get_current_time().format("YYYY-MM-DD")
         record = (date, artistid, popularity)
         c = db.cursor()
-        c.execute("INSERT OR IGNORE INTO spotify_popularity VALUES (?, ?, ?)", record)
+        c.execute("INSERT INTO spotify_popularity VALUES (%s, %s, %s)", record)
         db.commit()
 
-
-def create_db(fname):
-    db = sqlite3.connect(fname)
-    c = db.cursor()
-    with open(DBSCHEMA_PATH) as f:
-        c.executescript(f.read())
-    db.commit()

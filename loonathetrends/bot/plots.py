@@ -73,7 +73,7 @@ def new_followers(db):
 def youtube(db, videoid, metric="views", timeframe='short'):
     # get stats and clean up
     stats = pd.read_sql(
-        "select * from video_stats where video_id=? order by tstamp",
+        "select * from video_stats where video_id=%s order by tstamp",
         db,
         params=[videoid],
         parse_dates=["tstamp"],

@@ -1,5 +1,5 @@
 import loonathetrends as ltt
-import sqlite3
+import psycopg2
 import argparse
 import logging
 import os
@@ -14,7 +14,7 @@ logging.basicConfig(
     format="%(asctime)s:%(levelname)s:%(message)s",
 )
 
-db = sqlite3.connect(os.environ["DBPATH"])
+db = psycopg2.connect(os.environ["DBPATH"])
 logging.info("Database connected")
 
 if args.mode == "video-stats":
