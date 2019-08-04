@@ -38,3 +38,6 @@ elif args.mode == "followers":
 elif args.mode == "popularity":
     ltt.write_spotify_popularity(db)
     logging.info("Spotify popularity: done")
+
+db.close()
+

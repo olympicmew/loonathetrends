@@ -66,3 +66,4 @@ elif re.match(r"youtube-(?P<kind>\S+)", args.type):
     else:
         logging.info(status)
 
+db.close()
