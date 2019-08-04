@@ -257,11 +257,11 @@ def write_videostats(db):
                 "(video_id, title, published_at, description, moon_phase)"
                 "VALUES (?, ?, ?, ?, ?)",
                 (
-                    v["id"],
-                    v["title"],
-                    v["published_at"],
-                    v["description"],
-                    v["moon_phase"],
+                    v.get("id"),
+                    v.get("title"),
+                    v.get("published_at"),
+                    v.get("description"),
+                    v.get("moon_phase"),
                 ),
             )
             c.execute(
@@ -272,11 +272,11 @@ def write_videostats(db):
                 "INSERT OR IGNORE INTO video_stats VALUES (?, ?, ?, ?, ?, ?)",
                 (
                     date,
-                    v["id"],
-                    v["viewCount"],
-                    v["likeCount"],
-                    v["dislikeCount"],
-                    v["commentCount"],
+                    v.get("id"),
+                    v.get("viewCount"),
+                    v.get("likeCount"),
+                    v.get("dislikeCount"),
+                    v.get("commentCount"),
                 ),
             )
         db.commit()
