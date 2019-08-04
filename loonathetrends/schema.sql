@@ -1,31 +1,39 @@
-BEGIN TRANSACTION;
-CREATE TABLE IF NOT EXISTS `videos` (
-	`videoid`	TEXT NOT NULL UNIQUE,
-	`title`	TEXT NOT NULL,
-	`published_at`	TEXT,
-	`description`	TEXT,
-	`moon_phase`	REAL,
-	PRIMARY KEY(`videoid`)
-);
-CREATE TABLE IF NOT EXISTS `video_stats` (
-	`tstamp`	TEXT NOT NULL,
-	`videoid`	TEXT NOT NULL,
-	`views`	INTEGER,
-	`likes`	INTEGER,
-	`dislikes`	INTEGER,
-	`comments`	INTEGER,
-	PRIMARY KEY(`videoid`,`tstamp`)
-);
-CREATE TABLE IF NOT EXISTS `followers` (
-	`tstamp`	TEXT NOT NULL,
-	`site`	TEXT NOT NULL,
-	`resource_id`	TEXT NOT NULL,
-	`count`	INTEGER NOT NULL,
-	PRIMARY KEY(`site`,`resource_id`,`tstamp`)
-);
-CREATE TABLE IF NOT EXISTS `registry` (
-	`key` TEXT,
-	`value` TEXT,
-	PRIMARY KEY(`key`)
-);
-COMMIT;
+CREATE TABLE IF NOT EXISTS "video_stats"
+  (
+     `tstamp`   DATETIME NOT NULL,
+     `video_id` TEXT NOT NULL,
+     `views`    INTEGER,
+     `likes`    INTEGER,
+     `dislikes` INTEGER,
+     `comments` INTEGER,
+     PRIMARY KEY(`video_id`, `tstamp`)
+  );
+CREATE TABLE IF NOT EXISTS "videos"
+  (
+     `video_id`     TEXT NOT NULL UNIQUE,
+     `title`        TEXT NOT NULL,
+     `published_at` DATETIME,
+     `description`  TEXT,
+     `moon_phase`   REAL,
+     PRIMARY KEY(`video_id`)
+  );
+CREATE TABLE IF NOT EXISTS "followers"
+  (
+     `tstamp`      DATE NOT NULL,
+     `site`        TEXT NOT NULL,
+     `resource_id` TEXT NOT NULL,
+     `count`       INTEGER NOT NULL,
+     PRIMARY KEY(`site`, `resource_id`, `tstamp`)
+  );
+CREATE TABLE IF NOT EXISTS "spotify_popularity"
+  (
+     `tstamp`    DATE NOT NULL,
+     `artist_id` TEXT NOT NULL,
+     `popularity`INTEGER,
+     PRIMARY KEY(`tstamp`, `artist_id`)
+  );
+CREATE TABLE IF NOT EXISTS "registry"
+  (
+     `key`   TEXT PRIMARY KEY,
+     `value` TEXT
+  );
