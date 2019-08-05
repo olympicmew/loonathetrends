@@ -218,12 +218,10 @@ def youtube_milestone(db, dry_run=False):
 
 def youtube_milestone_reached(db, dry_run=False):
     videos = pd.read_sql(
-        "select video_id, title, published_at from videos",
+        "select video_id, title, age(published_at) as age from videos",
         db,
-        parse_dates=["published_at"],
     ).values
-    for video_id, title, published_at in videos:
-        age = pd.to_datetime("now") - published_at
+    for video_id, title, age in videos:
         if age < pd.Timedelta("3d"):
             continue
         elif age < pd.Timedelta("7d"):
@@ -241,7 +239,7 @@ def youtube_milestone_reached(db, dry_run=False):
             db, params={'video_id': video_id},
             parse_dates=["tstamp"],
             index_col="tstamp",
-        ).tz_localize("Asia/Seoul")
+        )
         try:
             now = arrow.now().floor("hour")
             past = now.shift(hours=-1)
@@ -275,9 +273,10 @@ def youtube_milestone_reached(db, dry_run=False):
 def youtube_statsdelivery(db, dry_run=False):
     lookup = get_video_title_lookup(db)
     c = db.cursor()
-    last_mention = c.execute(
+    c.execute(
         "SELECT value FROM registry WHERE key='last_mention_id'"
-    ).fetchone()
+    )
+    last_mention = c.fetchone()
     if last_mention:
         mentions = t.statuses.mentions_timeline(since_id=last_mention[0])
     else:
