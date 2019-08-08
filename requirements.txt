@@ -15,6 +15,7 @@ matplotlib==3.0.2
 numpy==1.15.4
 oauthlib==2.1.0
 pandas==0.23.4
+psycopg2==2.8.3
 pyasn1==0.4.5
 pyasn1-modules==0.2.3
 pyee==5.0.0
