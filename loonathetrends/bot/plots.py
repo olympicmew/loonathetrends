@@ -1,3 +1,4 @@
+from math import log10
 import pandas as pd
 import seaborn as sns
 from matplotlib.ticker import FuncFormatter
@@ -132,7 +133,7 @@ def youtube(db, videoid, metric="views", timeframe="short"):
             style = [".", "-", "-"]
             labels = ["Hourly measurements", "Daily average", "Weekly average"]
     # check whether to draw log plot
-    islog = (df[metric].std() / df[metric].mean()) >= 1.5
+    islog = log10(df[metric].max() / df[metric].min()) >= 1.5
 
     # draw plot
     ax = df.plot(
