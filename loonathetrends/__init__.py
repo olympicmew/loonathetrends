@@ -122,7 +122,7 @@ async def vlive_get_follower_count():
     selector = "span.value"
     browser = await launch()
     page = await browser.newPage()
-    await page.goto("https://channels.vlive.tv/E1F3A7/home")
+    await page.goto("https://channels.vlive.tv/E1F3A7/home", timeout=60000)
     await page.waitForSelector(selector)
     count = await page.Jeval(selector, "(element) => element.innerHTML")
     await browser.close()
@@ -133,7 +133,7 @@ async def daumcafe_get_follower_count():
     selector = "#cafeinfo_list > ul > li:nth-child(3) " "> span.txt_point.num.fl > a"
     browser = await launch()
     page = await browser.newPage()
-    await page.goto("http://cafe.daum.net/loonatheworld")
+    await page.goto("http://cafe.daum.net/loonatheworld", timeout=60000)
     for frame in page.mainFrame.childFrames:
         if frame.name == "down":
             count = await frame.Jeval(selector, "(element) => element.innerHTML")
@@ -145,7 +145,7 @@ async def instagram_get_follower_count():
     selector = "/html/body/span/section/main/div/header/section/ul/li[2]/a/span"
     browser = await launch()
     page = await browser.newPage()
-    await page.goto("https://www.instagram.com/loonatheworld/")
+    await page.goto("https://www.instagram.com/loonatheworld/", timeout=60000)
     await page.waitForXPath(selector)
     element, = await page.Jx(selector)
     count = await page.evaluate('(element) => element.getAttribute("title")', element)
@@ -159,6 +159,7 @@ async def melon_get_follower_count(artistid):
     await page.goto(
         "https://www.melon.com/artist/" "timeline.htm?artistId={}".format(artistid),
         waitUntil="domcontentloaded",
+        timeout=60000,
     )
     r = await page.waitForResponse(
         "https://www.melon.com/artist/"
