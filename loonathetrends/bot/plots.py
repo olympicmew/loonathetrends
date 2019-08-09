@@ -86,16 +86,25 @@ def youtube(db, videoid, metric="views", timeframe="short"):
         .tz_localize(None)
     )
     title = get_video_title_lookup(db)[videoid]
-    stats = stats.asfreq("h").diff().dropna().asfreq("h") * 24
-    stats.index = stats.index.shift(-1, "h")
+    stats = stats.asfreq("h")
+    #stats = stats.tshift(-1)
 
     # calculate moving averages
     df = pd.DataFrame(stats[metric])
     if timeframe == "medium":
-        df = df.resample("d").mean()
-        df = df.assign(avg_w=df.rolling("7d").mean(), avg_m=df.rolling("28d").mean())
+        df = df.asfreq('d', normalize=True).diff().dropna().asfreq('d').tshift(-1)
+        df = df.assign(
+            avg_w=df.rolling("7d", min_periods=5).mean(),
+            avg_m=df.rolling("28d", min_periods=26).mean(),
+        )
     else:
-        df = df.assign(avg_d=df.rolling("1d").mean(), avg_w=df.rolling("7d").mean())
+        df = df.diff().dropna().asfreq('h') * 24
+        df = df.assign(
+            avg_d=df.rolling("1d", min_periods=18).mean(),
+            avg_w=df.rolling("7d", min_periods=162).mean(),
+        )
+        hourly_data = df.pop(metric).tshift(-1)
+        df = pd.concat([hourly_data, df], axis=1)
     # trim depending on timeframe
     if timeframe == "medium":
         df = df.last("168d")
