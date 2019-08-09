@@ -70,7 +70,7 @@ def new_followers(db):
     )
 
 
-def youtube(db, videoid, metric="views", timeframe='short'):
+def youtube(db, videoid, metric="views", timeframe="short"):
     # get stats and clean up
     stats = pd.read_sql(
         "select * from video_stats where video_id=%s order by tstamp",
@@ -78,7 +78,12 @@ def youtube(db, videoid, metric="views", timeframe='short'):
         params=[videoid],
         parse_dates=["tstamp"],
     )
-    stats = stats.set_index("tstamp").drop("video_id", axis=1).tz_convert("Asia/Seoul").tz_localize(None)
+    stats = (
+        stats.set_index("tstamp")
+        .drop("video_id", axis=1)
+        .tz_convert("Asia/Seoul")
+        .tz_localize(None)
+    )
     title = get_video_title_lookup(db)[videoid]
     stats = stats.asfreq("h").diff().dropna().asfreq("h") * 24
     stats.index = stats.index.shift(-1, "h")
