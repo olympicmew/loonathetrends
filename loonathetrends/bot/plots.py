@@ -142,7 +142,7 @@ def youtube(db, videoid, metric="views", timeframe="short"):
             style = [".", "-", "-"]
             labels = ["Hourly measurements", "Daily average", "Weekly average"]
     # check whether to draw log plot
-    islog = log10(df[metric].max() / df[metric].min()) >= 1.5
+    islog = log10(df[metric].max() / df[metric].median()) > 1
 
     # draw plot
     ax = df.plot(
