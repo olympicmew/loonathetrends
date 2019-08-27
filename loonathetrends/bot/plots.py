@@ -33,7 +33,7 @@ def _add_watermark(fig):
         0.5,
         "cr: @loonathetrends",
         fontsize=36,
-        color="black",
+        color="white",
         ha="center",
         va="center",
         alpha=0.1,
