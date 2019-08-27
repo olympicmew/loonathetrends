@@ -13,6 +13,8 @@ sns.set(
     rc={
         "axes.facecolor": "15202b",
         "axes.edgecolor": "white",
+        "savefig.facecolor": "15202b",
+        "savefig.edgecolor": "none",
         "axes.labelcolor": "white",
         "axes.grid": True,
         "figure.facecolor": "15202b",
@@ -182,6 +184,6 @@ def youtube(db, videoid, metric="views", timeframe="short"):
 
     # save image of plot
     image = BytesIO()
-    ax.get_figure().savefig(image, format="png", dpi=160, bbox_inches="tight", facecolor='15202b')
+    ax.get_figure().savefig(image, format="png", dpi=160, bbox_inches="tight")
 
     return image.getvalue()
