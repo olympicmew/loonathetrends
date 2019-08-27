@@ -20,7 +20,6 @@ sns.set(
         "text.color": "white",
         "xtick.color": "white",
         "ytick.color": "white",
-        "patch.edgecolor": "red",
     },
 )
 sns.set_palette("pastel")
@@ -183,6 +182,6 @@ def youtube(db, videoid, metric="views", timeframe="short"):
 
     # save image of plot
     image = BytesIO()
-    ax.get_figure().savefig(image, format="png", dpi=160, bbox_inches="tight")
+    ax.get_figure().savefig(image, format="png", dpi=160, bbox_inches="tight", facecolor='15202b')
 
     return image.getvalue()
