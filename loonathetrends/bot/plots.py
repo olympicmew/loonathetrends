@@ -7,6 +7,8 @@ from io import BytesIO
 from loonathetrends.utils import get_video_title_lookup
 
 sns.set("talk", "ticks", font="Source Han Sans KR", rc={"axes.grid": True})
+plt.style.use("dark_background")
+sns.set_palette("pastel")
 
 
 def _add_watermark(fig):
