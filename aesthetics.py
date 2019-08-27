@@ -1,11 +1,10 @@
-import datetime
-import os
-import random
-import re
-
+import loonathetrends.utils as utils
 from twitter import OAuth, Twitter
-
-EPOCH = 736925  # LOONA's birthday
+import arrow
+import re
+import os
+import math
+from sys import argv
 
 auth = OAuth(
     os.environ["TWITTER_ACCESSTOKEN"],
@@ -16,69 +15,40 @@ auth = OAuth(
 t = Twitter(auth=auth)
 
 
-def get_loonaday(date: datetime.date = None):
-    if date is None:
-        date = datetime.date.today()
-    return date.toordinal() - EPOCH
-
-
-def get_byte(path, edit_file=True):
-    today = get_loonaday()
-    with open(path, "r+b") as f:
-        stream = bytearray(f.read())
-        byte = stream.pop(0)
-        if today % 2 and edit_file:
-            f.seek(0)
-            f.write(stream)
-            f.truncate(len(stream))
-        return byte
-
-
-def get_key(seed=None):
-    if seed is None:
-        seed = get_loonaday()
-    random.seed(seed)
-    return random.getrandbits(4)
-
-
-class Nibble(int):
-    _map = "🌕🐰🐱🕊🐸🌗🦌🦉🐟🦇🌚🦢🐧🦋🐺🌓"
-
-    def __new__(cls, n: int):
-        if n >= 16:
-            raise ValueError("Must be less than 16")
-        return super(Nibble, cls).__new__(cls, n)
-
-    def cypher(self, key: int = None):
-        if key is None:
-            key = get_key()
-        return Nibble(self ^ key)
-
-    def __repr__(self):
-        return f"Nibble({int(self)})"
-
-    def __str__(self):
-        return Nibble._map[self]
-
-
-def get_nibble(byte: int):
-    if get_loonaday() % 2:
-        return Nibble(byte >> 4)
-    else:
-        return Nibble(byte & 0x0F)
-
-
-def main():
+def update_handle():
     handle = t.account.verify_credentials()["name"]
-    byte = get_byte(os.getenv("CYPHERSTREAM_PATH"))
-    nibble = get_nibble(byte).cypher()
-    new_handle = re.sub(
-        r"^(loonathetrends) .",
-        r"\1 {}".format(nibble),
-        handle,
-    )
+    phase = utils.get_moon_phase(arrow.utcnow())
+    emoji = utils.get_moon_emoji(phase)
+    new_handle = re.sub(r"^(loonathetrends) [🌑🌒🌓🌔🌕🌖🌗🌘]", r"\1 {}".format(emoji), handle)
     t.account.update_profile(name=new_handle)
 
 
+def update_color():
+    birth = arrow.get("2018-08-20 18:00+0900")
+    days = (arrow.now() - birth).total_seconds() / 86400
+    r, g, b = (math.sin(2 * math.pi * days / i) for i in (28, 23, 33))
+
+    if r >= 0:
+        emo = (r, 0, 0)
+    else:
+        emo = (0, -r, -r)
+    if g >= 0:
+        phy = (0, g, 0)
+    else:
+        phy = (-g, 0, -g)
+    if b >= 0:
+        ine = (0, 0, b)
+    else:
+        ine = (-b, -b, 0)
+
+    fR = round((emo[0] + phy[0] + ine[0]) / 3 * 255)
+    fG = round((emo[1] + phy[1] + ine[1]) / 3 * 255)
+    fB = round((emo[2] + phy[2] + ine[2]) / 3 * 255)
+
+    color = f"{fR:02X}{fG:02X}{fB:02X}"
+    t.account.update_profile(profile_link_color=color)
+
+
 if __name__ == "__main__":
-    main()
+    update_handle()
+    update_color()
