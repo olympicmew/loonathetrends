@@ -6,8 +6,23 @@ import matplotlib.pyplot as plt
 from io import BytesIO
 from loonathetrends.utils import get_video_title_lookup
 
-sns.set("talk", "ticks", font="Source Han Sans KR", rc={"axes.grid": True})
-plt.style.use("dark_background")
+sns.set(
+    "talk",
+    "ticks",
+    font="Source Han Sans KR",
+    rc={
+        "axes.facecolor": "15202b",
+        "axes.edgecolor": "white",
+        "axes.labelcolor": "white",
+        "axes.grid": True,
+        "figure.facecolor": "15202b",
+        "grid.color": "3d5466",
+        "text.color": "white",
+        "xtick.color": "white",
+        "ytick.color": "white",
+        "patch.edgecolor": "red",
+    },
+)
 sns.set_palette("pastel")
 
 
@@ -89,18 +104,18 @@ def youtube(db, videoid, metric="views", timeframe="short"):
     )
     title = get_video_title_lookup(db)[videoid]
     stats = stats.asfreq("h")
-    #stats = stats.tshift(-1)
+    # stats = stats.tshift(-1)
 
     # calculate moving averages
     df = pd.DataFrame(stats[metric])
     if timeframe == "medium":
-        df = df.asfreq('d', normalize=True).diff().dropna().asfreq('d').tshift(-1)
+        df = df.asfreq("d", normalize=True).diff().dropna().asfreq("d").tshift(-1)
         df = df.assign(
             avg_w=df.rolling("7d", min_periods=5).mean(),
             avg_m=df.rolling("28d", min_periods=26).mean(),
         )
     else:
-        df = df.diff().dropna().asfreq('h') * 24
+        df = df.diff().dropna().asfreq("h") * 24
         df = df.assign(
             avg_d=df.rolling("1d", min_periods=18).mean(),
             avg_w=df.rolling("7d", min_periods=162).mean(),
