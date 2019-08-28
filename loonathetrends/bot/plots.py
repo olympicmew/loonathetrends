@@ -11,12 +11,12 @@ sns.set(
     "ticks",
     font="Source Han Sans KR",
     rc={
-        "axes.facecolor": "15202b",
+        "axes.facecolor": "2a343e",
         "axes.edgecolor": "white",
         "savefig.facecolor": "15202b",
         "savefig.edgecolor": "none",
-        "axes.labelcolor": "white",
         "axes.grid": True,
+        "axes.labelcolor": "white",
         "figure.facecolor": "15202b",
         "grid.color": "3d5466",
         "text.color": "white",
@@ -167,7 +167,7 @@ def youtube(db, videoid, metric="views", timeframe="short"):
         y=y,
         legend=has_legend,
         title=title,
-        markersize=3,
+        markersize=1,
         figsize=(10, 5),
         style=style,
         logy=islog,
@@ -175,6 +175,7 @@ def youtube(db, videoid, metric="views", timeframe="short"):
     # edit labels and add watermark
     ax.set_xlabel(None)
     ax.set_ylabel("{}/day".format(metric))
+    ax.grid(True, which='both')
     if has_legend:
         legend = ax.get_legend().get_texts()
         for label, text in zip(legend, labels):
