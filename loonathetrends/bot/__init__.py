@@ -233,8 +233,10 @@ def youtube_milestone_reached(db, dry_run=False):
 
         stats = pd.read_sql(
             (
-                "select tstamp, views from video_stats "
-                "where video_id = %(video_id)s order by tstamp"
+                "select tstamp, views from video_stats where "
+                "video_id = %(video_id)s and "
+                "tstamp >= (current_date - 28) "
+                "order by tstamp"
             ),
             db, params={'video_id': video_id},
             parse_dates=["tstamp"],
