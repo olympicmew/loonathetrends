@@ -162,18 +162,6 @@ def youtube(db, videoid, metric="views", timeframe="short"):
     # check whether to draw log plot
     islog = np.log10(df[metric].max() / df[metric].median()) > 1
 
-    # set ylims
-    if islog:
-        dflog = np.log(df[metric])
-        q1, q3 = dflog.quantile((.25, .75))
-        iqr = q3 - q1
-        ylim = tuple(np.exp((max(q1 - iqr*1.5, dflog.min()), min(q3 + iqr*1.5, dflog.max()))))
-        del dflog
-    else:
-        q1, q3 = df[metric].quantile((.25, .75))
-        iqr = q3 - q1
-        ylim = (max(q1 - iqr*1.5, df[metric].min()), min(q3 + iqr*1.5, df[metric].max()))
-
     # draw plot
     ax = df.plot(
         y=y,
@@ -183,7 +171,7 @@ def youtube(db, videoid, metric="views", timeframe="short"):
         figsize=(10, 5),
         style=style,
         logy=islog,
-        ylim=ylim,
+        ylim=tuple(df[metric].quantile((.05,.95))),
     )
     # edit labels and add watermark
     ax.set_xlabel(None)
