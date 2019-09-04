@@ -171,7 +171,6 @@ def youtube(db, videoid, metric="views", timeframe="short"):
         figsize=(10, 5),
         style=style,
         logy=islog,
-        ylim=tuple(df[metric].quantile((.01,.99))),
     )
     # edit labels and add watermark
     ax.set_xlabel(None)
