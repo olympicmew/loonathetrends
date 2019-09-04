@@ -172,7 +172,7 @@ def youtube(db, videoid, metric="views", timeframe="short"):
     else:
         q1, q3 = df[metric].quantile((.25, .75))
         iqr = q3 - q1
-        ylim = (max(q1 - iqr*1.5, df.min()), min(q3 + iqr*1.5, df.max()))
+        ylim = (max(q1 - iqr*1.5, df[metric].min()), min(q3 + iqr*1.5, df[metric].max()))
 
     # draw plot
     ax = df.plot(
