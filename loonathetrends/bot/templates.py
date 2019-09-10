@@ -26,7 +26,7 @@ youtube_update = "\n".join(
 ).format
 
 youtube_milestone = """\
-{date} #OrbitStreamingWednesday 🤖
+{date} It's #OrbitStreamingTime! 🤖
 
 This @loonatheworld video needs some love:
 {title}
