@@ -23,6 +23,14 @@ def get_proxies(crawlera_apikey):
     proxies = {"http": "http://" + proxy_url, "https": "https://" + proxy_url}
     return proxies
 
+def filter_1theK(videos):
+    for video in videos:
+        if video["snippet"]["channelId"] == "UCweOkPb1wVVH0Q0Tlj4a5Pw":
+            if "[MV] LOONA(이달의 소녀)" in video["snippet"]["title"]:
+                yield
+        else:
+            yield
+
 
 class YTRetriever(object):
     def __init__(self, api_key):
@@ -42,13 +50,13 @@ class YTRetriever(object):
             playlistId=playlist_id,
             maxResults=50,
             part="contentDetails",
-            fields="nextPageToken,items/contentDetails/videoId",
+            fields="nextPageToken,items/snippet",
         )
         videoids = []
         while request is not None:
             response = request.execute()
-            for i in response["items"]:
-                videoids.append(i["contentDetails"]["videoId"])
+            for i in filter_1theK(response["items"]):
+                videoids.append(i["snippet"]["resourceId"]["videoId"])
             request = self._playlist_items.list_next(request, response)
         return videoids
 
