@@ -8,6 +8,7 @@ import arrow
 from .utils import get_moon_phase
 import os
 import os.path
+import itertools
 import asyncio
 from pyppeteer import launch
 
@@ -23,13 +24,14 @@ def get_proxies(crawlera_apikey):
     proxies = {"http": "http://" + proxy_url, "https": "https://" + proxy_url}
     return proxies
 
+
 def filter_1theK(videos):
     for video in videos:
         if video["snippet"]["channelId"] == "UCweOkPb1wVVH0Q0Tlj4a5Pw":
-            if "[MV] LOONA(이달의 소녀)" in video["snippet"]["title"]:
-                yield
+            if "LOONA" in video["snippet"]["title"]:
+                yield video
         else:
-            yield
+            yield video
 
 
 class YTRetriever(object):
@@ -45,20 +47,27 @@ class YTRetriever(object):
         ).execute()
         return response["items"][0]["statistics"]
 
-    def get_video_ids(self, playlist_id):
+    def get_video_ids(self, playlist_id, get_all=False):
         request = self._playlist_items.list(
             playlistId=playlist_id,
             maxResults=50,
-            part="contentDetails",
-            fields="nextPageToken,items/snippet",
+            part="snippet,contentDetails",
+            fields="nextPageToken,items(snippet(channelId,title),contentDetails/videoId)",
         )
-        videoids = []
-        while request is not None:
+        if get_all:
+            videoids = []
+            while request is not None:
+                response = request.execute()
+                for i in filter_1theK(response["items"]):
+                    videoids.append(i["contentDetails"]["videoId"])
+                request = self._playlist_items.list_next(request, response)
+            return videoids
+        else:
             response = request.execute()
-            for i in filter_1theK(response["items"]):
-                videoids.append(i["snippet"]["resourceId"]["videoId"])
-            request = self._playlist_items.list_next(request, response)
-        return videoids
+            return [
+                video["contentDetails"]["videoId"]
+                for video in filter_1theK(response["items"])
+            ]
 
     def get_videos_info(self, video_ids):
         split_ids = [video_ids[i : i + 50] for i in range(0, len(video_ids), 50)]
@@ -252,44 +261,51 @@ def write_twitter(db):
 def write_videostats(db):
     playlistids = os.environ["YT_PLAYLISTIDS"].split(":")
     retriever = YTRetriever(os.environ["GOOGLEAPI_KEY"])
-    for playlistid in playlistids:
-        videoids = retriever.get_video_ids(playlistid)
-        videosinfo = retriever.get_videos_info(videoids)
-        date = get_current_time().shift(minutes=1).format("YYYY-MM-DD HH:mm")
-        c = db.cursor()
-        for v in videosinfo:
-            pubdate = (
-                arrow.get(v["published_at"]).to("Asia/Seoul").format("YYYY-MM-DD HH:00")
-            )
-            c.execute(
-                "INSERT INTO videos"
-                "(video_id, title, published_at, description, moon_phase)"
-                "VALUES (%s, %s, %s, %s, %s) ON CONFLICT (video_id) DO UPDATE "
-                "SET (title, description) = (EXCLUDED.title, EXCLUDED.description)",
-                (
-                    v.get("id"),
-                    v.get("title"),
-                    v.get("published_at"),
-                    v.get("description"),
-                    v.get("moon_phase"),
-                ),
-            )
-            c.execute(
-                "INSERT INTO video_stats VALUES (%s, %s, 0, 0, 0, 0) ON CONFLICT (video_id, tstamp) DO NOTHING",
-                (pubdate, v["id"]),
-            )
-            c.execute(
-                "INSERT INTO video_stats VALUES (%s, %s, %s, %s, %s, %s)",
-                (
-                    date,
-                    v.get("id"),
-                    v.get("viewCount"),
-                    v.get("likeCount"),
-                    v.get("dislikeCount"),
-                    v.get("commentCount"),
-                ),
-            )
-        db.commit()
+
+    videoids = set(
+        itertools.chain.from_iterable(
+            retriever.get_video_ids(playlistid) for playlistid in playlistids
+        )
+    )
+    with db.cursor() as c:
+        c.execute("SELECT video_id FROM videos")
+        videoids.update(row[0] for row in c)
+    videosinfo = retriever.get_videos_info(list(videoids))
+    date = get_current_time().shift(minutes=30).floor("hour").format("YYYY-MM-DD HH:mm")
+    c = db.cursor()
+    for v in videosinfo:
+        pubdate = (
+            arrow.get(v["published_at"]).to("Asia/Seoul").format("YYYY-MM-DD HH:00")
+        )
+        c.execute(
+            "INSERT INTO videos"
+            "(video_id, title, published_at, description, moon_phase)"
+            "VALUES (%s, %s, %s, %s, %s) ON CONFLICT (video_id) DO UPDATE "
+            "SET (title, description) = (EXCLUDED.title, EXCLUDED.description)",
+            (
+                v.get("id"),
+                v.get("title"),
+                v.get("published_at"),
+                v.get("description"),
+                v.get("moon_phase"),
+            ),
+        )
+        c.execute(
+            "INSERT INTO video_stats VALUES (%s, %s, 0, 0, 0, 0) ON CONFLICT (video_id, tstamp) DO NOTHING",
+            (pubdate, v["id"]),
+        )
+        c.execute(
+            "INSERT INTO video_stats VALUES (%s, %s, %s, %s, %s, %s)",
+            (
+                date,
+                v.get("id"),
+                v.get("viewCount"),
+                v.get("likeCount"),
+                v.get("dislikeCount"),
+                v.get("commentCount"),
+            ),
+        )
+    db.commit()
 
 
 def write_melon(db):
