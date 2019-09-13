@@ -1,21 +1,23 @@
-# TIMES ARE IN KOREAN STANDARD TIME
+#* * * * * ~/fetchviews/fetchviews.sh XEOCbFJjRw0 -o butterfly.csv
 
 59 17 * * *   ~/loonathetrends/fetch.sh followers
-59 *  * * *   ~/loonathetrends/fetch.sh video-stats
+55 *  * * *   ~/loonathetrends/fetch.sh video-stats
 0  12 * * *   ~/loonathetrends/fetch.sh popularity
+0  12 * * *   ~/spotifystats/spostats.sh
 
 0 18 * * 1-6  ~/loonathetrends/tweet.sh followers-daily
 0 18 * * 0    ~/loonathetrends/tweet.sh followers-weekly
 
 0 6 * * MON   ~/loonathetrends/tweet.sh youtube-likes
 0 6 * * TUE   ~/loonathetrends/tweet.sh youtube-latest
-0 6 * * WED   ~/loonathetrends/tweet.sh youtube-milestone
+0 6 * * WED   ~/loonathetrends/tweet.sh youtube-latest
 0 6 * * THU   ~/loonathetrends/tweet.sh youtube-latest
 0 6 * * FRI   ~/loonathetrends/tweet.sh youtube-views
 0 6 * * SAT   ~/loonathetrends/tweet.sh youtube-latest
 0 6 * * SUN   ~/loonathetrends/tweet.sh youtube-comments
 
-0 * * * * nice ~/loonathetrends/tweet.sh youtube-milestone-reached
+0 12 * * *   ~/loonathetrends/tweet.sh youtube-milestone
+0 *  * * *   nice ~/loonathetrends/tweet.sh youtube-milestone-reached
 
 #* * * * * nice ~/loonathetrends/tweet.sh youtube-statsdelivery
 
