@@ -223,7 +223,10 @@ def write_youtube(db):
         date = get_current_time().format("YYYY-MM-DD")
         record = (date, "youtube", channelid, stats["subscriberCount"])
         c = db.cursor()
-        c.execute("INSERT INTO followers VALUES (%s, %s, %s, %s) ON CONFLICT (site, resource_id, tstamp) DO NOTHING", record)
+        c.execute(
+            "INSERT INTO followers VALUES (%s, %s, %s, %s) ON CONFLICT (site, resource_id, tstamp) DO NOTHING",
+            record,
+        )
         db.commit()
 
 
@@ -237,7 +240,10 @@ def write_spotify(db):
         date = get_current_time().format("YYYY-MM-DD")
         record = (date, "spotify", artistid, count)
         c = db.cursor()
-        c.execute("INSERT INTO followers VALUES (%s, %s, %s, %s) ON CONFLICT (site, resource_id, tstamp) DO NOTHING", record)
+        c.execute(
+            "INSERT INTO followers VALUES (%s, %s, %s, %s) ON CONFLICT (site, resource_id, tstamp) DO NOTHING",
+            record,
+        )
         db.commit()
 
 
@@ -254,7 +260,10 @@ def write_twitter(db):
         date = get_current_time().format("YYYY-MM-DD")
         record = (date, "twitter", user, count)
         c = db.cursor()
-        c.execute("INSERT INTO followers VALUES (%s, %s, %s, %s) ON CONFLICT (site, resource_id, tstamp) DO NOTHING", record)
+        c.execute(
+            "INSERT INTO followers VALUES (%s, %s, %s, %s) ON CONFLICT (site, resource_id, tstamp) DO NOTHING",
+            record,
+        )
         db.commit()
 
 
@@ -332,4 +341,3 @@ def write_spotify_popularity(db):
         c = db.cursor()
         c.execute("INSERT INTO spotify_popularity VALUES (%s, %s, %s)", record)
         db.commit()
-
