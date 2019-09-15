@@ -56,19 +56,14 @@ def new_followers(db):
         "melon": "LOONA Melon new followers",
     }
     df = pd.read_sql(
-        "select tstamp, site, count from followers " "order by tstamp",
+        "select tstamp, site, count from followers order by tstamp",
         db,
         parse_dates=["tstamp"],
     ).set_index("tstamp")
     grouped = df.groupby("site")
     media = {}
     for site, stats in grouped["count"]:
-        stats = stats.asfreq("d")  # make sure to have days with no measurements
-        stats = stats.last("148d")
-        stats = stats.diff()  # get gain instead of cumulative followers
-        # special case for Instagram data
-        if site == "instagram":
-            stats["2019-02-13":"2019-02-14"] = None
+        stats = stats.asfreq("W").last("2y").diff()
         # create plot
         fig, ax = plt.subplots()
         stats.plot(ax=ax, title=titles[site], figsize=(10, 5))
