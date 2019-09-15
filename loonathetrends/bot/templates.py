@@ -81,6 +81,3 @@ youtube_statsdelivery_noloona = (
     "@{user} I only have stats for LOONA videos, sorry! 🤖".format
 )
 youtube_statsdelivery_smtm = "@{user} 😏 https://youtu.be/or6EBU-gKww".format
-youtube_statsdelivery_moebius = (
-    "@{user} Bleep bloop! You're served 🤖 https://youtu.be/DeoZhYJEn7o".format
-)

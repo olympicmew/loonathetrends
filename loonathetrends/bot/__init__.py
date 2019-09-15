@@ -293,7 +293,7 @@ def youtube_statsdelivery(db, dry_run=False):
             )
             db.commit()
         match = re.search(
-            r"show me (?:the )?(stats|views|comments|likes|dislikes|money|m(?:o|oe|ö)bius)",
+            r"show me (?:the )?(stats|views|comments|likes|dislikes|money)",
             tweet["text"],
             re.IGNORECASE,
         )
@@ -310,8 +310,6 @@ def youtube_statsdelivery(db, dry_run=False):
                 media = None
                 if match.group(1) == "money":
                     template = templates.youtube_statsdelivery_smtm
-                elif "bius" in match.group(1):
-                    template = templates.youtube_statsdelivery_moebius
                 else:
                     template = templates.youtube_statsdelivery_nourl
             if urlfound and lookup.get(videoid):
