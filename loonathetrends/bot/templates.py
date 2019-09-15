@@ -1,14 +1,17 @@
-followers_update = (
-    "{date} @loonatheworld SNS follower counts {freq} update 🤖\n"
-    "\n"
-    "YouTube: {tots[youtube]:,} ({difs[youtube]:+,})\n"
-    "Twitter: {tots[twitter]:,} ({difs[twitter]:+,})\n"
-    "Instagram: {tots[instagram]:,} ({difs[instagram]:+,})\n"
-    "Fancafe: {tots[daumcafe]:,} ({difs[daumcafe]:+,})\n"
-    "VLIVE: {tots[vlive]:,} ({difs[vlive]:+,})\n"
-    "Spotify: {tots[spotify]:,} ({difs[spotify]:+,})\n"
-    "Melon: {tots[melon]:,} ({difs[melon]:+,})\n"
-).format
+def followers_update(**fillin):
+    is_daily = fillin["freq"] == "daily"
+    s = "\n".join(
+        "{date} @loonatheworld SNS follower counts {freq} update 🤖",
+        "",
+        "YouTube: {tots[youtube]:,} ({difs[youtube]:+,})" if is_daily else None,
+        "Twitter: {tots[twitter]:,} ({difs[twitter]:+,})",
+        "Instagram: {tots[instagram]:,} ({difs[instagram]:+,})",
+        "Fancafe: {tots[daumcafe]:,} ({difs[daumcafe]:+,})",
+        "VLIVE: {tots[vlive]:,} ({difs[vlive]:+,})",
+        "Spotify: {tots[spotify]:,} ({difs[spotify]:+,})",
+        "Melon: {tots[melon]:,} ({difs[melon]:+,})",
+    )
+    return s.format(**fillin)
 
 youtube_update = "\n".join(
     (
