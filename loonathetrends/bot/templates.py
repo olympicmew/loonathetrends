@@ -13,6 +13,7 @@ def followers_update(**fillin):
     )
     return s.format(**fillin)
 
+
 youtube_update = "\n".join(
     (
         "{date} YouTube stats update 🤖",
@@ -37,6 +38,16 @@ This @loonatheworld video needs some love:
 
 It needs {diff:,.0f} views to reach {milestone}. It should get there {prediction}, but we can make it happen faster!
 """.format
+
+youtube_milestone = "\n".join(
+    "{date} It's #OrbitStreamingTime! 🤖",
+    "",
+    "This @loonatheworld video needs some love:",
+    "{title}",
+    "▶️ http://youtu.be/{videoid}",
+    "",
+    "It needs {diff:,.0f} views to reach {milestone}. It should get there {prediction}, but we can make it happen faster!)",
+).format
 
 
 def youtube_milestone_reached(**fillin):
