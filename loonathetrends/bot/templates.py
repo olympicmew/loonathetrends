@@ -60,12 +60,13 @@ def youtube_milestone_reached(**fillin):
             "{title}",
             "▶️ http://youtu.be/{videoid}",
             "",
+            "",
         )
     )
     if not celebration:
-        s = s + "has reached {views:,.0f} views!"
+        s += "has reached {views:,.0f} views!"
     else:
-        s = s + "\n".join(
+        s += "\n".join(
             (
                 "has finally reached {views:,.0f} views! 🎊",
                 "Congratulations Orbits! 🎉 Keep going~",
