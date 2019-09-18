@@ -170,7 +170,7 @@ def youtube(db, videoid, metric="views", timeframe="short"):
     # edit labels and add watermark
     ax.set_xlabel(None)
     ax.set_ylabel("{}/day".format(metric))
-    ax.grid(True, which='both')
+    ax.grid(True, which="both")
     if has_legend:
         legend = ax.get_legend().get_texts()
         for label, text in zip(legend, labels):
