@@ -1,15 +1,26 @@
 def followers_update(**fillin):
     is_daily = fillin["freq"] == "daily"
     s = "\n".join(
-        "{date} @loonatheworld SNS follower counts {freq} update 🤖",
-        "",
-        "YouTube: {tots[youtube]:,} ({difs[youtube]:+,})" if is_daily else None,
-        "Twitter: {tots[twitter]:,} ({difs[twitter]:+,})",
-        "Instagram: {tots[instagram]:,} ({difs[instagram]:+,})",
-        "Fancafe: {tots[daumcafe]:,} ({difs[daumcafe]:+,})",
-        "VLIVE: {tots[vlive]:,} ({difs[vlive]:+,})",
-        "Spotify: {tots[spotify]:,} ({difs[spotify]:+,})",
-        "Melon: {tots[melon]:,} ({difs[melon]:+,})",
+        tuple(
+            filter(
+                lambda x: x is not None,
+                (
+                    "{date} @loonatheworld SNS follower counts {freq} update 🤖",
+                    "",
+                    "YouTube: {tots[youtube]:,} ({difs[youtube]:+,})"
+                    if not is_daily
+                    else None,
+                    "Twitter: {tots[twitter]:,} ({difs[twitter]:+,})",
+                    "Instagram: {tots[instagram]:,} ({difs[instagram]:+,})",
+                    "Fancafe: {tots[daumcafe]:,} ({difs[daumcafe]:+,})",
+                    "VLIVE: {tots[vlive]:,} ({difs[vlive]:+,})",
+                    "Spotify: {tots[spotify]:,} ({difs[spotify]:+,})",
+                    "Melon: {tots[melon]:,} ({difs[melon]:+,})"
+                    if not is_daily
+                    else None,
+                ),
+            )
+        )
     )
     return s.format(**fillin)
 
