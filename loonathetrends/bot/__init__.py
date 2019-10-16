@@ -242,9 +242,9 @@ def youtube_milestone_reached(db, dry_run=False):
             parse_dates=["tstamp"],
             index_col="tstamp",
         )
+        now = arrow.now().floor("hour")
+        past = now.shift(hours=-1)
         try:
-            now = arrow.now().floor("hour")
-            past = now.shift(hours=-1)
             vt_now = stats.views.loc[now.datetime]
             vt_past = stats.views.loc[past.datetime]
             delta = stats.diff(window).views.iloc[-1]
