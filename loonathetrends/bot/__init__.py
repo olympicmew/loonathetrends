@@ -250,9 +250,7 @@ def youtube_milestone_reached(db, dry_run=False):
             delta = stats.diff(window).views.iloc[-1]
         except KeyError:
             continue
-        a = round(np.log10(delta))
-        if a < 5:
-            continue
+        a = max(round(np.log10(delta)), 5)
         if (vt_now // (10 ** a)) > (vt_past // (10 ** a)):
             fillin = {
                 "videoid": video_id,
