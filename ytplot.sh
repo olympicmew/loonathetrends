@@ -1,6 +1,4 @@
 #!/bin/bash
-export DBPATH="***REMOVED***"
-export IMGUR_CLIENTID="***REMOVED***"
 cd $HOME/loonathetrends
 source venv/bin/activate
 python ytplot.py $@ | \
