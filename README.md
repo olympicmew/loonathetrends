@@ -1,5 +1,5 @@
 # Yuxi
-Stats fetcher and bot powering Twitter account @loonathetrends.
+Stats fetcher and bot powering Twitter account [@loonathetrends](https://twitter.com/loonathetrends).
 
 ## Requirements
 - Python >= 3.7
