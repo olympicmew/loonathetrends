@@ -1,0 +1,22 @@
+version: "3.5"
+
+services:
+  ltt_postgres:
+    image: postgres:12.0-alpine
+    networks:
+      - ltt-network
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=loona
+    ports:
+      - 10864:5432
+    volumes:
+      - ./volumes/postgres/data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    container_name: ltt_postgres
+
+networks:
+  ltt-network:
+    name: ltt-network
+    driver: bridge
