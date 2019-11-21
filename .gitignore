@@ -145,3 +145,5 @@ dmypy.json
 # Misc
 last-good-commit
 log-archives/
+
+.vscode/

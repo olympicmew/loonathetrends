@@ -1,0 +1,18 @@
+version: "3.5"
+
+services:
+  ltt_service:
+    container_name: ltt_service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - ltt-network
+    volumes:
+      - .:/app:rw
+    env_file: ./dev.env
+
+networks:
+  ltt-network:
+    name: ltt-network
+    driver: bridge
