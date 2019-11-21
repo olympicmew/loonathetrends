@@ -147,3 +147,5 @@ last-good-commit
 log-archives/
 
 .vscode/
+supervisord.pid
+dev.env
