@@ -1,0 +1,7 @@
+service/
+loonathetrends/
+venv/
+
+Dockerfile*
+docker-compose*
+.git
