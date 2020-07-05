@@ -27,14 +27,26 @@ elif args.mode == "followers":
     logging.info("Spotify: done")
     ltt.write_twitter(db)
     logging.info("Twitter: done")
-    ltt.write_daumcafe(db)
-    logging.info("Fancafe: done")
-    ltt.write_instagram(db)
-    logging.info("Instagram: done")
-    ltt.write_melon(db)
-    logging.info("Melon: done")
-    ltt.write_vlive(db)
-    logging.info("VLIVE: done")
+    try:
+        ltt.write_daumcafe(db)
+        logging.info("Fancafe: done")
+    except:
+        logging.info("Fancafe: failed")
+    try:
+        ltt.write_instagram(db)
+        logging.info("Instagram: done")
+    except:
+        logging.info("Instagram: failed")
+    try:
+        ltt.write_melon(db)
+        logging.info("Melon: done")
+    except:
+        logging.info("Melon: failed")
+    try:
+        ltt.write_vlive(db)
+        logging.info("VLIVE: done")
+    except:
+        logging.info("VLIVE: failed")
 elif args.mode == "popularity":
     ltt.write_spotify_popularity(db)
     logging.info("Spotify popularity: done")

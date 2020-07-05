@@ -58,7 +58,7 @@ def followers_update(db, freq, dry_run=False, post_plots=False):
     difs = (grouped.last()["count"] - grouped.first()["count"]).to_dict()
     status = template(freq=freq, date=date, tots=tots, difs=difs)
     if _status_length(status) > 280:
-        raise RuntimeError(f"The status update is {status_len} characters long.")
+        raise RuntimeError(f"The status update is {_status_length(status)} characters long.")
     if post_plots:
         media = plots.new_followers(db)
     else:
@@ -158,7 +158,7 @@ def youtube_update(db, kind, dry_run=False):
         videoid=videoid,
     )
     if _status_length(status) > 280:
-        raise RuntimeError(f"The status update is {status_len} characters long.")
+        raise RuntimeError(f"The status update is {_status_length(status)} characters long.")
 
     # post on twitter
     if not dry_run:
@@ -210,7 +210,7 @@ def youtube_milestone(db, dry_run=False):
     template = templates.youtube_milestone
     status = template(**fillin)
     if _status_length(status) > 280:
-        raise RuntimeError(f"The status update is {status_len} characters long.")
+        raise RuntimeError(f"The status update is {_status_length(status)} characters long.")
     if not dry_run:
         t.statuses.update(status=status)
     return status

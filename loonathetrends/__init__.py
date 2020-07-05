@@ -159,7 +159,7 @@ async def daumcafe_get_follower_count():
 
 
 async def instagram_get_follower_count():
-    selector = "/html/body/span/section/main/div/header/section/ul/li[2]/a/span"
+    selector = "/html/body/div[1]/section/main/div/header/section/ul/li[2]/a/span"
     browser = await launch()
     page = await browser.newPage()
     await page.goto("https://www.instagram.com/loonatheworld/", timeout=60000)
@@ -284,7 +284,7 @@ def write_videostats(db):
     c = db.cursor()
     for v in videosinfo:
         pubdate = (
-            arrow.get(v["published_at"]).to("Asia/Seoul").format("YYYY-MM-DD HH:00")
+            arrow.get(v["published_at"]).to("Asia/Seoul").shift(minutes=30).floor("hour").format("YYYY-MM-DD HH:mm")
         )
         c.execute(
             "INSERT INTO videos"

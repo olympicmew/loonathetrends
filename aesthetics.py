@@ -73,7 +73,7 @@ def main():
     byte = get_byte(os.getenv("CYPHERSTREAM_PATH"))
     nibble = get_nibble(byte).cypher()
     new_handle = re.sub(
-        r"^(loonathetrends) .",
+        r"^(loona the trends) .",
         r"\1 {}".format(nibble),
         handle,
     )

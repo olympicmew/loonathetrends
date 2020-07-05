@@ -43,13 +43,13 @@ youtube_update = "\n".join(
 
 youtube_milestone = "\n".join(
     (
-        "{date} It's #OrbitStreamingTime! 🤖",
+        "{date} #OrbitStreamingTime 🤖",
         "",
-        "This @loonatheworld video needs some love:",
         "{title}",
         "▶️ http://youtu.be/{videoid}",
         "",
-        "It needs {diff:,.0f} views to reach {milestone}. It should get there {prediction}, but we can make it happen faster!)",
+        "This @loonatheworld video needs {diff:,.0f} views to reach {milestone}!",
+        "It should get there {prediction}, but we can make it happen sooner~",
     )
 ).format
 
